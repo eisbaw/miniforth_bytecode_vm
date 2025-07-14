@@ -1,0 +1,2 @@
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ar qc libvm.a CMakeFiles/vm.dir/miniforth.c.o CMakeFiles/vm.dir/instructions.c.o
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ranlib libvm.a

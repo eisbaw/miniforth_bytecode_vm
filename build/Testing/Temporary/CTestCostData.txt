@@ -1,0 +1,4 @@
+vm_tests 1 0.00222714
+compiler_tests 2 0.000983674
+integration_tests 2 0.000901549
+---

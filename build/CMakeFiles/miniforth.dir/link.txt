@@ -1,0 +1,1 @@
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/gcc -Wall -Wextra -Wpedantic -std=c99 -g -O0 -DDEBUG CMakeFiles/miniforth.dir/src/main.c.o -o miniforth  src/vm/libvm.a src/compiler/libcompiler.a src/tools/libtools.a src/vm/libvm.a

@@ -222,20 +222,20 @@ void test_function_calls() {
     
     // Simple function call test
     uint16_t program[] = {
-        OP_CALL, 6,     // call function at address 6
+        OP_CALL, 5,     // call function at address 5
         OP_LIT, 99,     // this should execute after return
         OP_EXIT,        // end of main
-        OP_LIT, 42,     // function body (address 6)
+        OP_LIT, 42,     // function body (address 5)
         OP_EXIT         // return from function
     };
-    assert(vm_load_program(vm, program, 10) == 0);
+    assert(vm_load_program(vm, program, 8) == 0);
     assert(vm_run(vm) == VM_OK);
     
     uint16_t result1, result2;
     assert(vm_pop(vm, &result1) == VM_OK);
     assert(vm_pop(vm, &result2) == VM_OK);
-    assert(result1 == 99);  // From main after return
-    assert(result2 == 42);  // From function
+    assert(result1 == 99);  // From main after return (top of stack)
+    assert(result2 == 42);  // From function (bottom of stack)
     
     vm_destroy(vm);
 }

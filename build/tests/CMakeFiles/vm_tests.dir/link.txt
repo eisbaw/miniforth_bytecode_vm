@@ -1,0 +1,1 @@
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/gcc -Wall -Wextra -Wpedantic -std=c99 -g -O0 -DDEBUG CMakeFiles/vm_tests.dir/vm_tests.c.o -o vm_tests  ../src/vm/libvm.a

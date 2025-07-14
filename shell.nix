@@ -22,7 +22,7 @@ pkgs.mkShell {
     
     # Standard development tools
     gdb
-    make
+    gnumake
     
     # Git for version control
     git

@@ -1,0 +1,2 @@
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ar qc libtools.a CMakeFiles/tools.dir/assembler.c.o CMakeFiles/tools.dir/disassembler.c.o CMakeFiles/tools.dir/debugger.c.o
+/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ranlib libtools.a
