@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "lexer.h"
+#include "parser.h"
 
 // Test result tracking
 static int tests_run = 0;
@@ -192,9 +193,145 @@ void test_lexer_comments() {
     lexer_destroy(lexer);
 }
 
-// Placeholder tests (will be implemented later)
+// Parser tests
+void test_parser_expressions() {
+    // Test 1: Simple arithmetic expression
+    const char *source = "2 + 3 * 4";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *expr = parse_expression(parser);
+    assert(expr != NULL);
+    assert(expr->type == AST_BINARY_OP);
+    assert(expr->data.binary.op == TOKEN_PLUS);
+    
+    // Left side should be number 2
+    assert(expr->data.binary.left->type == AST_NUMBER);
+    assert(expr->data.binary.left->data.number.value == 2);
+    
+    // Right side should be multiplication
+    assert(expr->data.binary.right->type == AST_BINARY_OP);
+    assert(expr->data.binary.right->data.binary.op == TOKEN_MULTIPLY);
+    
+    ast_destroy(expr);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test 2: Parenthesized expression
+    source = "(2 + 3) * 4";
+    lexer = lexer_create(source);
+    parser = parser_create(lexer);
+    
+    expr = parse_expression(parser);
+    assert(expr != NULL);
+    assert(expr->type == AST_BINARY_OP);
+    assert(expr->data.binary.op == TOKEN_MULTIPLY);
+    
+    // Left side should be addition
+    assert(expr->data.binary.left->type == AST_BINARY_OP);
+    assert(expr->data.binary.left->data.binary.op == TOKEN_PLUS);
+    
+    // Right side should be number 4
+    assert(expr->data.binary.right->type == AST_NUMBER);
+    assert(expr->data.binary.right->data.number.value == 4);
+    
+    ast_destroy(expr);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_parser_variables() {
+    // Test variable declaration using parse_program
+    const char *source = "int x;";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    assert(program->type == AST_PROGRAM);
+    
+    ast_node_t *stmt = program->data.block.statements;
+    assert(stmt != NULL);
+    assert(stmt->type == AST_VARIABLE_DECL);
+    assert(strcmp(stmt->data.var_decl.name, "x") == 0);
+    
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test variable declaration with assignment
+    source = "int y = 42;";
+    lexer = lexer_create(source);
+    parser = parser_create(lexer);
+    
+    program = parse_program(parser);
+    assert(program != NULL);
+    assert(program->type == AST_PROGRAM);
+    
+    stmt = program->data.block.statements;
+    assert(stmt != NULL);
+    assert(stmt->type == AST_ASSIGNMENT);
+    
+    // Target should be variable declaration
+    assert(stmt->data.assignment.target->type == AST_VARIABLE_DECL);
+    assert(strcmp(stmt->data.assignment.target->data.var_decl.name, "y") == 0);
+    
+    // Value should be number 42
+    assert(stmt->data.assignment.value->type == AST_NUMBER);
+    assert(stmt->data.assignment.value->data.number.value == 42);
+    
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_parser_statements() {
+    // Test return statement
+    const char *source = "return 42;";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *stmt = parse_statement(parser);
+    assert(stmt != NULL);
+    assert(stmt->type == AST_RETURN_STMT);
+    assert(stmt->data.return_stmt.expression != NULL);
+    assert(stmt->data.return_stmt.expression->type == AST_NUMBER);
+    assert(stmt->data.return_stmt.expression->data.number.value == 42);
+    
+    ast_destroy(stmt);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test block statement
+    source = "{ x = 5; y = 10; }";
+    lexer = lexer_create(source);
+    parser = parser_create(lexer);
+    
+    stmt = parse_statement(parser);
+    assert(stmt != NULL);
+    assert(stmt->type == AST_BLOCK);
+    assert(stmt->data.block.statements != NULL);
+    
+    // First statement should be assignment
+    ast_node_t *first = stmt->data.block.statements;
+    assert(first->type == AST_BINARY_OP);
+    assert(first->data.binary.op == TOKEN_ASSIGN);
+    
+    // Second statement should be linked
+    ast_node_t *second = first->next;
+    assert(second != NULL);
+    assert(second->type == AST_BINARY_OP);
+    assert(second->data.binary.op == TOKEN_ASSIGN);
+    
+    ast_destroy(stmt);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
 void test_parser_basic() {
-    printf("  Parser tests not yet implemented\n");
+    test_parser_expressions();
+    test_parser_variables();
+    test_parser_statements();
 }
 
 void test_codegen_basic() {

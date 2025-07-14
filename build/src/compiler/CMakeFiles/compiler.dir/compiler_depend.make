@@ -21,18 +21,31 @@ src/compiler/CMakeFiles/compiler.dir/codegen.c.o: /home/mpedersen/topics/minifor
 
 src/compiler/CMakeFiles/compiler.dir/lexer.c.o: /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.c \
   /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h \
+  /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdarg.h \
   /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stddef.h \
+  /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdint.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endian.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endianness.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn-common.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/libc-header-start.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/long-double.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-intn.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-least.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-uintn.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdio_lim.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdlib-float.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/time64.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/timesize.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/FILE.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__FILE.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos64_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__mbstate_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/struct_FILE.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/typesizes.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wchar.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wordsize.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/ctype.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features-time64.h \
@@ -40,26 +53,48 @@ src/compiler/CMakeFiles/compiler.dir/lexer.c.o: /home/mpedersen/topics/miniforth
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs-64.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdc-predef.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdint.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdio.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdlib.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/string.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/sys/cdefs.h
 
 src/compiler/CMakeFiles/compiler.dir/parser.c.o: /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.c \
+  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h \
   /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h \
+  /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdarg.h \
   /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stddef.h \
+  /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdint.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn-common.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/libc-header-start.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/long-double.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-intn.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-least.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-uintn.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdio_lim.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdlib-float.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/time64.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/timesize.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/FILE.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__FILE.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos64_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__mbstate_t.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/struct_FILE.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/typesizes.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wchar.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wordsize.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features-time64.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs-64.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdc-predef.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdint.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdio.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdlib.h \
+  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/string.h \
   /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/sys/cdefs.h
 
 src/compiler/CMakeFiles/compiler.dir/symbols.c.o: /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.c \
@@ -83,6 +118,22 @@ src/compiler/CMakeFiles/compiler.dir/symbols.c.o: /home/mpedersen/topics/minifor
 
 /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h:
 
+/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.c:
+
+/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h:
+
+/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.c:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wchar.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/typesizes.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__mbstate_t.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos_t.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__FILE.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features-time64.h:
@@ -101,15 +152,15 @@ src/compiler/CMakeFiles/compiler.dir/symbols.c.o: /home/mpedersen/topics/minifor
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/libc-header-start.h:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdio_lim.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn.h:
 
 /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stddef.h:
 
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/typesizes.h:
-
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/long-double.h:
 
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/string.h:
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdio.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/floatn-common.h:
 
@@ -119,24 +170,38 @@ src/compiler/CMakeFiles/compiler.dir/symbols.c.o: /home/mpedersen/topics/minifor
 
 /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.c:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/ctype.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/struct_FILE.h:
+
+/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdc-predef.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos64_t.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdlib.h:
 
-/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.c:
+/nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdarg.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/string.h:
+
+/nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdint.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endian.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endianness.h:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-intn.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/FILE.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-uintn.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdint.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-least.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/sys/cdefs.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types.h:
-
-/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.c:
-
-/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/ctype.h:
-
-/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h:
