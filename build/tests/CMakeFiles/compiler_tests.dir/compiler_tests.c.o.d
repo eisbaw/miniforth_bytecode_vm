@@ -66,4 +66,7 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-uintn.h \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-least.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h \
- /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/../vm/miniforth.h

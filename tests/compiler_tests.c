@@ -4,6 +4,7 @@
 #include <string.h>
 #include "lexer.h"
 #include "parser.h"
+#include "codegen.h"
 
 // Test result tracking
 static int tests_run = 0;
@@ -334,8 +335,140 @@ void test_parser_basic() {
     test_parser_statements();
 }
 
+void test_codegen_expressions() {
+    // Test 1: Simple number literal
+    const char *source = "42";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *expr = parse_expression(parser);
+    assert(expr != NULL);
+    
+    codegen_t *codegen = codegen_create(64);
+    assert(codegen != NULL);
+    
+    int result = codegen_expression(codegen, expr);
+    assert(result == 0);
+    assert(codegen->code_size == 2);  // LIT + operand
+    assert(codegen->code[0] == OP_LIT);
+    assert(codegen->code[1] == 42);
+    
+    ast_destroy(expr);
+    codegen_destroy(codegen);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test 2: Simple addition
+    source = "2 + 3";
+    lexer = lexer_create(source);
+    parser = parser_create(lexer);
+    
+    expr = parse_expression(parser);
+    assert(expr != NULL);
+    
+    codegen = codegen_create(64);
+    assert(codegen != NULL);
+    
+    result = codegen_expression(codegen, expr);
+    assert(result == 0);
+    assert(codegen->code_size == 5);  // LIT 2, LIT 3, ADD
+    assert(codegen->code[0] == OP_LIT);
+    assert(codegen->code[1] == 2);
+    assert(codegen->code[2] == OP_LIT);
+    assert(codegen->code[3] == 3);
+    assert(codegen->code[4] == OP_ADD);
+    
+    ast_destroy(expr);
+    codegen_destroy(codegen);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test 3: Complex expression with precedence
+    source = "2 + 3 * 4";
+    lexer = lexer_create(source);
+    parser = parser_create(lexer);
+    
+    expr = parse_expression(parser);
+    assert(expr != NULL);
+    
+    codegen = codegen_create(64);
+    assert(codegen != NULL);
+    
+    result = codegen_expression(codegen, expr);
+    assert(result == 0);
+    assert(codegen->code_size == 8);  // LIT 2, LIT 3, LIT 4, MUL, ADD
+    assert(codegen->code[0] == OP_LIT);
+    assert(codegen->code[1] == 2);
+    assert(codegen->code[2] == OP_LIT);
+    assert(codegen->code[3] == 3);
+    assert(codegen->code[4] == OP_LIT);
+    assert(codegen->code[5] == 4);
+    assert(codegen->code[6] == OP_MUL);
+    assert(codegen->code[7] == OP_ADD);
+    
+    ast_destroy(expr);
+    codegen_destroy(codegen);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_codegen_statements() {
+    // Test return statement
+    const char *source = "return 42;";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *stmt = parse_statement(parser);
+    assert(stmt != NULL);
+    
+    codegen_t *codegen = codegen_create(64);
+    assert(codegen != NULL);
+    
+    int result = codegen_statement(codegen, stmt);
+    assert(result == 0);
+    assert(codegen->code_size == 3);  // LIT 42, EXIT
+    assert(codegen->code[0] == OP_LIT);
+    assert(codegen->code[1] == 42);
+    assert(codegen->code[2] == OP_EXIT);
+    
+    ast_destroy(stmt);
+    codegen_destroy(codegen);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_codegen_programs() {
+    // Test simple program
+    const char *source = "return 2 + 3;";
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    
+    codegen_t *codegen = codegen_create(64);
+    assert(codegen != NULL);
+    
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    assert(codegen->code_size == 6);  // LIT 2, LIT 3, ADD, EXIT
+    assert(codegen->code[0] == OP_LIT);
+    assert(codegen->code[1] == 2);
+    assert(codegen->code[2] == OP_LIT);
+    assert(codegen->code[3] == 3);
+    assert(codegen->code[4] == OP_ADD);
+    assert(codegen->code[5] == OP_EXIT);
+    
+    ast_destroy(program);
+    codegen_destroy(codegen);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
 void test_codegen_basic() {
-    printf("  Code generation tests not yet implemented\n");
+    test_codegen_expressions();
+    test_codegen_statements();
+    test_codegen_programs();
 }
 
 int main() {

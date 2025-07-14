@@ -3,6 +3,8 @@
 
 tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/compiler_tests.c
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/vm/miniforth.h
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.h
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h
  /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdarg.h
