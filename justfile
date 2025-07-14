@@ -3,6 +3,13 @@
 # Show all available commands
 default:
     @just --list
+    @echo ""
+    @echo "🔍 Useful recipes:"
+    @echo "  just build        - Build the project"
+    @echo "  just test         - Run all tests"
+    @echo "  just code-size    - Analyze source and binary code size"
+    @echo "  just status       - Show project status"
+    @echo "  just clean        - Clean build artifacts"
 
 # Build the project
 build:
@@ -101,6 +108,81 @@ install: build-release
     @sudo cp build/miniforth-assembler /usr/local/bin/
     @sudo cp build/miniforth-debugger /usr/local/bin/
     @echo "Installation complete!"
+
+# Measure code size (source and binary)
+code-size: build
+    @echo "Miniforth Bytecode VM Code Size Analysis"
+    @echo "========================================"
+    @echo ""
+    @echo "📊 Source Code Metrics:"
+    @echo "======================"
+    @echo "VM Source Files:"
+    @find src/vm/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
+    @find src/vm/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
+    @echo "  Files: $(find src/vm/ -name '*.c' -o -name '*.h' | wc -l)"
+    @echo ""
+    @echo "Compiler Source Files:"
+    @find src/compiler/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
+    @find src/compiler/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
+    @echo "  Files: $(find src/compiler/ -name '*.c' -o -name '*.h' | wc -l)"
+    @echo ""
+    @echo "Total Project Source:"
+    @find src/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
+    @find src/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
+    @echo "  Files: $(find src/ -name '*.c' -o -name '*.h' | wc -l)"
+    @echo ""
+    @echo "💾 Binary Size Analysis:"
+    @echo "======================="
+    @if [ -f build/miniforth ]; then \
+        echo "Main executable (miniforth):"; \
+        ls -lh build/miniforth | awk '{print "  Size: " $$5 " (" $$5 " bytes)"}'; \
+        echo "  Stripped size: $(strip -s build/miniforth -o /tmp/miniforth_stripped 2>/dev/null && ls -lh /tmp/miniforth_stripped | awk '{print $$5}' && rm -f /tmp/miniforth_stripped || echo 'N/A')"; \
+    else \
+        echo "Main executable: Not built"; \
+    fi
+    @echo ""
+    @echo "VM Components:"
+    @if [ -f build/src/vm/libminiforth_vm.a ]; then \
+        echo "  VM Library: $(ls -lh build/src/vm/libminiforth_vm.a 2>/dev/null | awk '{print $$5}' || echo 'N/A')"; \
+    fi
+    @if [ -f build/src/compiler/libminiforth_compiler.a ]; then \
+        echo "  Compiler Library: $(ls -lh build/src/compiler/libminiforth_compiler.a 2>/dev/null | awk '{print $$5}' || echo 'N/A')"; \
+    fi
+    @echo ""
+    @echo "Test Executables:"
+    @if [ -f build/tests/vm_tests ]; then \
+        echo "  VM Tests: $(ls -lh build/tests/vm_tests | awk '{print $$5}')"; \
+    fi
+    @if [ -f build/tests/compiler_tests ]; then \
+        echo "  Compiler Tests: $(ls -lh build/tests/compiler_tests | awk '{print $$5}')"; \
+    fi
+    @if [ -f build/tests/integration_tests ]; then \
+        echo "  Integration Tests: $(ls -lh build/tests/integration_tests | awk '{print $$5}')"; \
+    fi
+    @echo ""
+    @echo "🔍 Size Breakdown by Component:"
+    @echo "=============================="
+    @echo "VM Core Instructions:"
+    @wc -l src/vm/instructions.c | awk '{print "  instructions.c: " $$1 " lines"}'
+    @echo "VM Main Engine:"
+    @wc -l src/vm/miniforth.c | awk '{print "  miniforth.c: " $$1 " lines"}'
+    @echo "Compiler Lexer:"
+    @wc -l src/compiler/lexer.c | awk '{print "  lexer.c: " $$1 " lines"}'
+    @echo "Compiler Parser:"
+    @wc -l src/compiler/parser.c | awk '{print "  parser.c: " $$1 " lines"}'
+    @echo "Code Generator:"
+    @wc -l src/compiler/codegen.c | awk '{print "  codegen.c: " $$1 " lines"}'
+    @echo "Symbol Table:"
+    @wc -l src/compiler/symbols.c | awk '{print "  symbols.c: " $$1 " lines"}'
+    @echo ""
+    @echo "📈 Build Artifacts Size:"
+    @echo "======================="
+    @if [ -d build ]; then \
+        echo "Total build directory: $(du -sh build | awk '{print $$1}')"; \
+        echo "Object files: $(find build -name '*.o' | wc -l) files, $(find build -name '*.o' -exec ls -l {} + 2>/dev/null | awk '{sum+=$$5} END {print sum/1024 "KB"}' || echo '0KB')"; \
+    else \
+        echo "Build directory: Not found"; \
+    fi
 
 # Show project status
 status:
