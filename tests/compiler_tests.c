@@ -759,6 +759,105 @@ void test_codegen_multiple_variables() {
     lexer_destroy(lexer);
 }
 
+void test_parser_arrays() {
+    printf("  Testing array parsing...\n");
+    
+    // Test array declaration
+    const char *array_decl = "int arr[10];";
+    lexer_t *lexer = lexer_create(array_decl);
+    parser_t *parser = parser_create(lexer);
+    ast_node_t *program = parse_program(parser);
+    
+    assert(program != NULL);
+    assert(parser->error_count == 0);
+    
+    ast_node_t *decl = program->data.block.statements;
+    assert(decl != NULL);
+    assert(decl->type == AST_ARRAY_DECL);
+    assert(strcmp(decl->data.array_decl.name, "arr") == 0);
+    assert(decl->data.array_decl.size == 10);
+    
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+    
+    // Test array access
+    const char *array_access = "return arr[5];";
+    lexer = lexer_create(array_access);
+    parser = parser_create(lexer);
+    program = parse_program(parser);
+    
+    assert(program != NULL);
+    assert(parser->error_count == 0);
+    
+    ast_node_t *ret_stmt = program->data.block.statements;
+    assert(ret_stmt != NULL);
+    assert(ret_stmt->type == AST_RETURN_STMT);
+    
+    ast_node_t *access = ret_stmt->data.return_stmt.expression;
+    assert(access != NULL);
+    assert(access->type == AST_ARRAY_ACCESS);
+    
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_codegen_arrays() {
+    printf("  Testing array compilation and execution...\n");
+    
+    // Test array declaration, assignment, and access
+    const char *source = 
+        "int numbers[4];"
+        "numbers[0] = 1;"
+        "numbers[1] = 2;"
+        "numbers[2] = 3;"
+        "numbers[3] = 4;"
+        "int sum = 0;"
+        "sum = numbers[0] + numbers[1] + numbers[2] + numbers[3];"
+        "return sum;";
+    
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    assert(parser->error_count == 0);
+    
+    codegen_t *codegen = codegen_create(256);
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    assert(codegen->error_count == 0);
+    
+    // Check that array was declared in symbol table
+    symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, "numbers");
+    assert(array_symbol != NULL);
+    assert(array_symbol->type == SYMBOL_VARIABLE);
+    assert(array_symbol->size == 4);
+    
+    // Test execution
+    miniforth_vm_t *vm = vm_create(128, 64, 32);
+    result = vm_load_program(vm, codegen->code, codegen->code_size);
+    assert(result == VM_OK);
+    
+    vm_error_t exec_result = vm_run(vm);
+    assert(exec_result == VM_OK);
+    
+    // Should return sum = 1 + 2 + 3 + 4 = 10
+    assert(vm->sp > 0);
+    assert(vm->data_stack[vm->sp - 1] == 10);
+    
+    vm_destroy(vm);
+    codegen_destroy(codegen);
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_arrays_basic() {
+    test_parser_arrays();
+    test_codegen_arrays();
+}
+
 void test_codegen_basic() {
     test_codegen_expressions();
     test_codegen_statements();
@@ -781,6 +880,7 @@ int main() {
     TEST(test_lexer_comments);
     TEST(test_parser_basic);
     TEST(test_symbols_basic);
+    TEST(test_arrays_basic);
     TEST(test_codegen_basic);
     
     printf("\nTest Results:\n");

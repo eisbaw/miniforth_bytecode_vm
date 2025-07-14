@@ -226,6 +226,35 @@ ast_node_t* ast_create_block(ast_node_t *statements) {
     return node;
 }
 
+ast_node_t* ast_create_array_decl(const char *name, int size) {
+    ast_node_t *node = malloc(sizeof(ast_node_t));
+    if (!node) return NULL;
+    
+    node->type = AST_ARRAY_DECL;
+    node->data.array_decl.name = malloc(strlen(name) + 1);
+    if (!node->data.array_decl.name) {
+        free(node);
+        return NULL;
+    }
+    strcpy(node->data.array_decl.name, name);
+    node->data.array_decl.size = size;
+    node->next = NULL;
+    
+    return node;
+}
+
+ast_node_t* ast_create_array_access(ast_node_t *array, ast_node_t *index) {
+    ast_node_t *node = malloc(sizeof(ast_node_t));
+    if (!node) return NULL;
+    
+    node->type = AST_ARRAY_ACCESS;
+    node->data.array_access.array = array;
+    node->data.array_access.index = index;
+    node->next = NULL;
+    
+    return node;
+}
+
 // AST destruction
 void ast_destroy(ast_node_t *node) {
     if (!node) return;
@@ -247,6 +276,13 @@ void ast_destroy(ast_node_t *node) {
             break;
         case AST_VARIABLE_DECL:
             free(node->data.var_decl.name);
+            break;
+        case AST_ARRAY_DECL:
+            free(node->data.array_decl.name);
+            break;
+        case AST_ARRAY_ACCESS:
+            ast_destroy(node->data.array_access.array);
+            ast_destroy(node->data.array_access.index);
             break;
         case AST_FUNCTION:
             free(node->data.function.name);
@@ -280,7 +316,18 @@ static ast_node_t* parse_primary(parser_t *parser) {
         if (len >= 256) len = 255;
         strncpy(name, parser->previous_token.text, len);
         name[len] = '\0';
-        return ast_create_identifier(name);
+        
+        ast_node_t *identifier = ast_create_identifier(name);
+        
+        // Check for array access: identifier[index]
+        if (check(parser, TOKEN_LBRACKET)) {
+            advance(parser);  // consume '['
+            ast_node_t *index = parse_expression(parser);
+            consume(parser, TOKEN_RBRACKET, "Expected ']' after array index");
+            return ast_create_array_access(identifier, index);
+        }
+        
+        return identifier;
     }
     
     if (match(parser, TOKEN_LPAREN)) {
@@ -426,6 +473,23 @@ static ast_node_t* parse_variable_declaration(parser_t *parser) {
     strncpy(name, parser->previous_token.text, len);
     name[len] = '\0';
     
+    // Check for array declaration: name[size]
+    if (match(parser, TOKEN_LBRACKET)) {
+        if (!check(parser, TOKEN_NUMBER)) {
+            parser_error_at_current(parser, "Expected array size");
+            return NULL;
+        }
+        
+        int size = parser->current_token.value;
+        advance(parser);
+        consume(parser, TOKEN_RBRACKET, "Expected ']' after array size");
+        
+        ast_node_t *decl = ast_create_array_decl(name, size);
+        consume(parser, TOKEN_SEMICOLON, "Expected ';' after array declaration");
+        return decl;
+    }
+    
+    // Regular variable declaration
     ast_node_t *decl = ast_create_variable_decl(name, 1);
     
     if (match(parser, TOKEN_ASSIGN)) {
@@ -483,6 +547,9 @@ void ast_print(ast_node_t *node, int depth) {
             break;
         case AST_VARIABLE_DECL:
             printf(": %s", node->data.var_decl.name);
+            break;
+        case AST_ARRAY_DECL:
+            printf(": %s[%d]", node->data.array_decl.name, node->data.array_decl.size);
             break;
         default:
             break;

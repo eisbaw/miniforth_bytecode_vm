@@ -124,6 +124,35 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
                     
                     // The duplicated value remains on stack as the result
                     return 0;
+                } else if (target->type == AST_ARRAY_ACCESS) {
+                    // Array assignment: arr[index] = value
+                    ast_node_t *array_node = target->data.array_access.array;
+                    if (array_node->type != AST_IDENTIFIER) {
+                        codegen_error(codegen, "Array assignment requires identifier");
+                        return -1;
+                    }
+                    
+                    symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+                    if (!array_symbol) {
+                        codegen_error(codegen, "Undefined array in assignment");
+                        return -1;
+                    }
+                    
+                    // Duplicate the value for the assignment result
+                    if (codegen_emit(codegen, OP_DUP) < 0) return -1;
+                    
+                    // Compile the index expression
+                    if (codegen_expression(codegen, target->data.array_access.index) < 0) return -1;
+                    
+                    // Add the base address to the index: base_addr + index
+                    if (codegen_emit_with_operand(codegen, OP_LIT, array_symbol->address) < 0) return -1;
+                    if (codegen_emit(codegen, OP_ADD) < 0) return -1;
+                    
+                    // Store the value at the computed address
+                    if (codegen_emit(codegen, OP_STORE) < 0) return -1;
+                    
+                    // The duplicated value remains on stack as the result
+                    return 0;
                 } else {
                     codegen_error(codegen, "Invalid assignment target");
                     return -1;
@@ -175,6 +204,32 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
                     codegen_error(codegen, "Unsupported unary operator");
                     return -1;
             }
+        }
+        
+        case AST_ARRAY_ACCESS: {
+            // Array access: array[index]
+            // First get the array base address (from the identifier)
+            ast_node_t *array_node = expr->data.array_access.array;
+            if (array_node->type != AST_IDENTIFIER) {
+                codegen_error(codegen, "Array access requires identifier");
+                return -1;
+            }
+            
+            symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+            if (!array_symbol) {
+                codegen_error(codegen, "Undefined array");
+                return -1;
+            }
+            
+            // Compile the index expression
+            if (codegen_expression(codegen, expr->data.array_access.index) < 0) return -1;
+            
+            // Add the base address to the index: base_addr + index
+            if (codegen_emit_with_operand(codegen, OP_LIT, array_symbol->address) < 0) return -1;
+            if (codegen_emit(codegen, OP_ADD) < 0) return -1;
+            
+            // Fetch the value from the computed address
+            return codegen_emit(codegen, OP_FETCH);
         }
         
         default:
@@ -232,6 +287,26 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt) {
             return codegen_emit(codegen, OP_STORE);
         }
         
+        case AST_ARRAY_DECL: {
+            // Declare array in symbol table
+            symbol_t *symbol = symbol_table_declare(codegen->symbols, 
+                                                   stmt->data.array_decl.name, 
+                                                   SYMBOL_VARIABLE, 
+                                                   stmt->data.array_decl.size);
+            if (!symbol) {
+                codegen_error(codegen, "Array already declared or allocation failed");
+                return -1;
+            }
+            
+            // Initialize array elements to 0
+            for (int i = 0; i < stmt->data.array_decl.size; i++) {
+                if (codegen_emit_with_operand(codegen, OP_LIT, 0) < 0) return -1;
+                if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address + i) < 0) return -1;
+                if (codegen_emit(codegen, OP_STORE) < 0) return -1;
+            }
+            return 0;
+        }
+        
         case AST_ASSIGNMENT: {
             // Compile the value expression first
             if (codegen_expression(codegen, stmt->data.assignment.value) < 0) return -1;
@@ -262,6 +337,31 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt) {
                 
                 // Store the value at the variable address
                 if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+                return codegen_emit(codegen, OP_STORE);
+            } else if (target->type == AST_ARRAY_ACCESS) {
+                // Array assignment: arr[index] = value
+                // Value is already on stack, now compute address
+                
+                ast_node_t *array_node = target->data.array_access.array;
+                if (array_node->type != AST_IDENTIFIER) {
+                    codegen_error(codegen, "Array assignment requires identifier");
+                    return -1;
+                }
+                
+                symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+                if (!array_symbol) {
+                    codegen_error(codegen, "Undefined array in assignment");
+                    return -1;
+                }
+                
+                // Compile the index expression
+                if (codegen_expression(codegen, target->data.array_access.index) < 0) return -1;
+                
+                // Add the base address to the index: base_addr + index
+                if (codegen_emit_with_operand(codegen, OP_LIT, array_symbol->address) < 0) return -1;
+                if (codegen_emit(codegen, OP_ADD) < 0) return -1;
+                
+                // Store the value at the computed address
                 return codegen_emit(codegen, OP_STORE);
             } else {
                 codegen_error(codegen, "Invalid assignment target");

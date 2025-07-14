@@ -33,6 +33,7 @@ struct ast_node {
     union {
         struct { char *name; ast_node_t *params; ast_node_t *body; } function;
         struct { char *name; int size; } var_decl;
+        struct { char *name; int size; } array_decl;
         struct { int op; ast_node_t *left; ast_node_t *right; } binary;
         struct { int op; ast_node_t *operand; } unary;
         struct { ast_node_t *target; ast_node_t *value; } assignment;
@@ -90,6 +91,8 @@ ast_node_t* ast_create_variable_decl(const char *name, int size);
 ast_node_t* ast_create_function(const char *name, ast_node_t *params, ast_node_t *body);
 ast_node_t* ast_create_return(ast_node_t *expression);
 ast_node_t* ast_create_block(ast_node_t *statements);
+ast_node_t* ast_create_array_decl(const char *name, int size);
+ast_node_t* ast_create_array_access(ast_node_t *array, ast_node_t *index);
 
 // AST utility functions
 void ast_destroy(ast_node_t *node);
