@@ -70,4 +70,5 @@ tests/CMakeFiles/integration_tests.dir/integration_tests.c.o: \
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/compiler/lexer.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/compiler/codegen.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/compiler/parser.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/compiler/symbols.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/compiler/../vm/miniforth.h

@@ -17,7 +17,14 @@ codegen_t* codegen_create(size_t initial_capacity) {
     
     codegen->code_capacity = initial_capacity;
     codegen->code_size = 0;
+    codegen->symbols = symbol_table_create(0);  // Use default size
     codegen->error_count = 0;
+    
+    if (!codegen->symbols) {
+        free(codegen->code);
+        free(codegen);
+        return NULL;
+    }
     
     return codegen;
 }
@@ -25,6 +32,7 @@ codegen_t* codegen_create(size_t initial_capacity) {
 void codegen_destroy(codegen_t *codegen) {
     if (codegen) {
         free(codegen->code);
+        symbol_table_destroy(codegen->symbols);
         free(codegen);
     }
 }
@@ -68,12 +76,61 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
             // Emit LIT instruction with the number value
             return codegen_emit_with_operand(codegen, OP_LIT, expr->data.number.value);
             
-        case AST_IDENTIFIER:
-            // For now, just emit error - variables need symbol table
-            codegen_error(codegen, "Variables not yet supported");
-            return -1;
+        case AST_IDENTIFIER: {
+            // Look up variable in symbol table
+            char name[256];
+            int len = strlen(expr->data.identifier.name);
+            if (len >= 256) len = 255;
+            strncpy(name, expr->data.identifier.name, len);
+            name[len] = '\0';
+            
+            symbol_t *symbol = symbol_table_lookup(codegen->symbols, name);
+            if (!symbol) {
+                codegen_error(codegen, "Undefined variable");
+                return -1;
+            }
+            
+            if (symbol->type != SYMBOL_VARIABLE && symbol->type != SYMBOL_LOCAL && symbol->type != SYMBOL_PARAMETER) {
+                codegen_error(codegen, "Identifier is not a variable");
+                return -1;
+            }
+            
+            // Emit LIT <address>, FETCH to load variable value
+            if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+            return codegen_emit(codegen, OP_FETCH);
+        }
             
         case AST_BINARY_OP: {
+            // Handle assignment separately
+            if (expr->data.binary.op == TOKEN_ASSIGN) {
+                // Compile the right operand (value) first
+                if (codegen_expression(codegen, expr->data.binary.right) < 0) return -1;
+                
+                // Handle assignment target (left operand)
+                ast_node_t *target = expr->data.binary.left;
+                if (target->type == AST_IDENTIFIER) {
+                    symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
+                    if (!symbol) {
+                        codegen_error(codegen, "Undefined variable in assignment");
+                        return -1;
+                    }
+                    
+                    // Duplicate the value for the assignment result
+                    if (codegen_emit(codegen, OP_DUP) < 0) return -1;
+                    
+                    // Store the value: value addr STORE
+                    if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+                    if (codegen_emit(codegen, OP_STORE) < 0) return -1;
+                    
+                    // The duplicated value remains on stack as the result
+                    return 0;
+                } else {
+                    codegen_error(codegen, "Invalid assignment target");
+                    return -1;
+                }
+            }
+            
+            // Regular binary operations
             // Compile left operand
             if (codegen_expression(codegen, expr->data.binary.left) < 0) return -1;
             
@@ -140,13 +197,76 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt) {
             return codegen_emit(codegen, OP_EXIT);
             
         case AST_BLOCK: {
+            // Enter new scope for block
+            symbol_table_enter_scope(codegen->symbols);
+            
             // Compile all statements in the block
             ast_node_t *current = stmt->data.block.statements;
             while (current) {
-                if (codegen_statement(codegen, current) < 0) return -1;
+                if (codegen_statement(codegen, current) < 0) {
+                    symbol_table_exit_scope(codegen->symbols);
+                    return -1;
+                }
                 current = current->next;
             }
+            
+            // Exit scope
+            symbol_table_exit_scope(codegen->symbols);
             return 0;
+        }
+        
+        case AST_VARIABLE_DECL: {
+            // Declare variable in symbol table
+            symbol_t *symbol = symbol_table_declare(codegen->symbols, 
+                                                   stmt->data.var_decl.name, 
+                                                   SYMBOL_VARIABLE, 
+                                                   stmt->data.var_decl.size);
+            if (!symbol) {
+                codegen_error(codegen, "Variable already declared or allocation failed");
+                return -1;
+            }
+            
+            // Initialize variable to 0
+            if (codegen_emit_with_operand(codegen, OP_LIT, 0) < 0) return -1;
+            if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+            return codegen_emit(codegen, OP_STORE);
+        }
+        
+        case AST_ASSIGNMENT: {
+            // Compile the value expression first
+            if (codegen_expression(codegen, stmt->data.assignment.value) < 0) return -1;
+            
+            // Handle assignment target
+            ast_node_t *target = stmt->data.assignment.target;
+            if (target->type == AST_IDENTIFIER) {
+                // Simple variable assignment
+                symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
+                if (!symbol) {
+                    codegen_error(codegen, "Undefined variable in assignment");
+                    return -1;
+                }
+                
+                // Emit LIT <address>, STORE
+                if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+                return codegen_emit(codegen, OP_STORE);
+            } else if (target->type == AST_VARIABLE_DECL) {
+                // Variable declaration with assignment
+                symbol_t *symbol = symbol_table_declare(codegen->symbols, 
+                                                       target->data.var_decl.name, 
+                                                       SYMBOL_VARIABLE, 
+                                                       target->data.var_decl.size);
+                if (!symbol) {
+                    codegen_error(codegen, "Variable already declared or allocation failed");
+                    return -1;
+                }
+                
+                // Store the value at the variable address
+                if (codegen_emit_with_operand(codegen, OP_LIT, symbol->address) < 0) return -1;
+                return codegen_emit(codegen, OP_STORE);
+            } else {
+                codegen_error(codegen, "Invalid assignment target");
+                return -1;
+            }
         }
         
         default:

@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "codegen.h"
+#include "symbols.h"
 #include "../src/vm/miniforth.h"
 
 // Test result tracking
@@ -512,11 +513,260 @@ void test_codegen_integration() {
     lexer_destroy(lexer);
 }
 
+void test_symbol_table_basic() {
+    // Test symbol table creation
+    symbol_table_t *table = symbol_table_create(16);
+    assert(table != NULL);
+    assert(table->current_scope == 0);
+    assert(table->symbol_count == 0);
+    assert(table->next_address == 0);
+    
+    // Test variable declaration
+    symbol_t *var1 = symbol_table_declare(table, "x", SYMBOL_VARIABLE, 1);
+    assert(var1 != NULL);
+    assert(strcmp(var1->name, "x") == 0);
+    assert(var1->type == SYMBOL_VARIABLE);
+    assert(var1->address == 0);
+    assert(var1->size == 1);
+    assert(var1->scope_level == 0);
+    assert(table->symbol_count == 1);
+    assert(table->next_address == 1);
+    
+    // Test variable lookup
+    symbol_t *found = symbol_table_lookup(table, "x");
+    assert(found == var1);
+    
+    // Test second variable
+    symbol_t *var2 = symbol_table_declare(table, "y", SYMBOL_VARIABLE, 2);
+    assert(var2 != NULL);
+    assert(var2->address == 1);  // Should be after first variable
+    assert(table->next_address == 3);
+    
+    // Test duplicate declaration in same scope (should fail)
+    symbol_t *duplicate = symbol_table_declare(table, "x", SYMBOL_VARIABLE, 1);
+    assert(duplicate == NULL);
+    assert(table->symbol_count == 2);  // Count should not change
+    
+    symbol_table_destroy(table);
+}
+
+void test_symbol_table_scopes() {
+    symbol_table_t *table = symbol_table_create(16);
+    assert(table != NULL);
+    
+    // Declare variable in global scope
+    symbol_t *global_x = symbol_table_declare(table, "x", SYMBOL_VARIABLE, 1);
+    assert(global_x != NULL);
+    assert(global_x->scope_level == 0);
+    
+    // Enter new scope
+    symbol_table_enter_scope(table);
+    assert(table->current_scope == 1);
+    
+    // Declare variable with same name in new scope
+    symbol_t *local_x = symbol_table_declare(table, "x", SYMBOL_LOCAL, 1);
+    assert(local_x != NULL);
+    assert(local_x->scope_level == 1);
+    assert(local_x != global_x);
+    
+    // Lookup should find the local variable (higher scope)
+    symbol_t *found = symbol_table_lookup(table, "x");
+    assert(found == local_x);
+    
+    // Declare another variable in local scope
+    symbol_t *local_y = symbol_table_declare(table, "y", SYMBOL_LOCAL, 1);
+    assert(local_y != NULL);
+    assert(table->symbol_count == 3);
+    
+    // Exit scope - local variables should be removed
+    symbol_table_exit_scope(table);
+    assert(table->current_scope == 0);
+    assert(table->symbol_count == 1);  // Only global variable remains
+    
+    // Lookup should now find global variable
+    found = symbol_table_lookup(table, "x");
+    assert(found == global_x);
+    
+    // Local variable should not be found
+    found = symbol_table_lookup(table, "y");
+    assert(found == NULL);
+    
+    symbol_table_destroy(table);
+}
+
+void test_symbol_table_memory() {
+    symbol_table_t *table = symbol_table_create(16);
+    assert(table != NULL);
+    
+    // Test memory allocation
+    uint16_t addr1 = symbol_table_allocate_memory(table, 4);
+    assert(addr1 == 0);
+    assert(table->next_address == 4);
+    
+    uint16_t addr2 = symbol_table_allocate_memory(table, 2);
+    assert(addr2 == 4);
+    assert(table->next_address == 6);
+    
+    // Test variable declaration with automatic memory allocation
+    symbol_t *array = symbol_table_declare(table, "arr", SYMBOL_VARIABLE, 10);
+    assert(array != NULL);
+    assert(array->address == 6);
+    assert(array->size == 10);
+    assert(table->next_address == 16);
+    
+    symbol_table_destroy(table);
+}
+
+void test_symbol_table_functions() {
+    symbol_table_t *table = symbol_table_create(16);
+    assert(table != NULL);
+    
+    // Test function declaration
+    symbol_t *func = symbol_table_declare(table, "main", SYMBOL_FUNCTION, 0);
+    assert(func != NULL);
+    assert(func->type == SYMBOL_FUNCTION);
+    assert(func->address == 0);  // Functions don't get memory addresses
+    
+    // Test parameter declaration
+    symbol_table_enter_scope(table);
+    symbol_t *param = symbol_table_declare(table, "argc", SYMBOL_PARAMETER, 1);
+    assert(param != NULL);
+    assert(param->type == SYMBOL_PARAMETER);
+    assert(param->address == 0);  // First parameter gets address 0
+    
+    symbol_table_exit_scope(table);
+    symbol_table_destroy(table);
+}
+
+void test_symbols_basic() {
+    test_symbol_table_basic();
+    test_symbol_table_scopes();
+    test_symbol_table_memory();
+    test_symbol_table_functions();
+}
+
+void test_codegen_variables() {
+    printf("  Testing variable declaration and usage...\n");
+    
+    // Test simple variable declaration and use
+    const char *source = "int x; x = 42; return x;";
+    
+    // Step 1: Lex
+    lexer_t *lexer = lexer_create(source);
+    assert(lexer != NULL);
+    
+    // Step 2: Parse
+    parser_t *parser = parser_create(lexer);
+    assert(parser != NULL);
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    assert(parser->error_count == 0);
+    
+    // Step 3: Generate code
+    codegen_t *codegen = codegen_create(128);
+    assert(codegen != NULL);
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    assert(codegen->error_count == 0);
+    
+    // Step 4: Create VM and execute
+    miniforth_vm_t *vm = vm_create(128, 64, 32);
+    assert(vm != NULL);
+    
+    result = vm_load_program(vm, codegen->code, codegen->code_size);
+    assert(result == VM_OK);
+    
+    vm_error_t exec_result = vm_run(vm);
+    assert(exec_result == VM_OK);
+    
+    // Verify the result
+    assert(vm->sp > 0);
+    assert(vm->data_stack[vm->sp - 1] == 42);
+    
+    // Cleanup
+    vm_destroy(vm);
+    codegen_destroy(codegen);
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_codegen_variable_assignment() {
+    printf("  Testing variable assignment expressions...\n");
+    
+    // Test assignment as expression: return x = 10 + 5;
+    const char *source = "int x; return x = 10 + 5;";
+    
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    
+    codegen_t *codegen = codegen_create(128);
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    
+    miniforth_vm_t *vm = vm_create(128, 64, 32);
+    result = vm_load_program(vm, codegen->code, codegen->code_size);
+    assert(result == VM_OK);
+    
+    vm_error_t exec_result = vm_run(vm);
+    assert(exec_result == VM_OK);
+    
+    // Assignment expression should return the assigned value
+    assert(vm->sp > 0);
+    assert(vm->data_stack[vm->sp - 1] == 15);
+    
+    // Cleanup
+    vm_destroy(vm);
+    codegen_destroy(codegen);
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
+void test_codegen_multiple_variables() {
+    printf("  Testing multiple variables...\n");
+    
+    // Test multiple variables: int x; int y; x = 10; y = 20; return x + y;
+    const char *source = "int x; int y; x = 10; y = 20; return x + y;";
+    
+    lexer_t *lexer = lexer_create(source);
+    parser_t *parser = parser_create(lexer);
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    
+    codegen_t *codegen = codegen_create(128);
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    
+    miniforth_vm_t *vm = vm_create(128, 64, 32);
+    result = vm_load_program(vm, codegen->code, codegen->code_size);
+    assert(result == VM_OK);
+    
+    vm_error_t exec_result = vm_run(vm);
+    assert(exec_result == VM_OK);
+    
+    // Should return 30
+    assert(vm->sp > 0);
+    assert(vm->data_stack[vm->sp - 1] == 30);
+    
+    // Cleanup
+    vm_destroy(vm);
+    codegen_destroy(codegen);
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
 void test_codegen_basic() {
     test_codegen_expressions();
     test_codegen_statements();
     test_codegen_programs();
     test_codegen_integration();
+    test_codegen_variables();
+    test_codegen_variable_assignment();
+    test_codegen_multiple_variables();
 }
 
 int main() {
@@ -530,6 +780,7 @@ int main() {
     TEST(test_lexer_expression);
     TEST(test_lexer_comments);
     TEST(test_parser_basic);
+    TEST(test_symbols_basic);
     TEST(test_codegen_basic);
     
     printf("\nTest Results:\n");

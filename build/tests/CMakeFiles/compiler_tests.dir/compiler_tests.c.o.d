@@ -69,5 +69,7 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/../vm/miniforth.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/tests/../src/vm/miniforth.h

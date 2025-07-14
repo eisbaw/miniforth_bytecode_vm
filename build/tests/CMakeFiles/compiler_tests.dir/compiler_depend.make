@@ -6,6 +6,8 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
   /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.h \
   /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h \
   /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/parser.h \
+  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h \
+  /home/mpedersen/topics/miniforth_bytecode_vm/src/vm/miniforth.h \
   /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdarg.h \
   /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stddef.h \
   /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdint.h \
@@ -90,6 +92,10 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/struct_timespec.h:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs-64.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/timer_t.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/struct_mutex.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/libc-header-start.h:
@@ -108,6 +114,12 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endianness.h:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdint.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endian.h:
+
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__locale_t.h:
+
 /home/mpedersen/topics/miniforth_bytecode_vm/src/vm/miniforth.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types.h:
@@ -115,14 +127,6 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/pthreadtypes.h:
 
 /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/codegen.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/thread-shared-types.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdint.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/endian.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__locale_t.h:
 
 /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/lexer.h:
 
@@ -160,9 +164,13 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
 
 /nix/store/62qjb50708fdhb4f2y7zxyqr1afir4fk-gcc-13.3.0/lib/gcc/x86_64-unknown-linux-gnu/13.3.0/include/stdint.h:
 
+/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/thread-shared-types.h:
+
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/timesize.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__FILE.h:
+
+/home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/__fpos64_t.h:
 
@@ -205,7 +213,3 @@ tests/CMakeFiles/compiler_tests.dir/compiler_tests.c.o: /home/mpedersen/topics/m
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/wordsize.h:
 
 /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/features.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/types/timer_t.h:
-
-/nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/gnu/stubs-64.h:

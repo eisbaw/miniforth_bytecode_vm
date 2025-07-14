@@ -34,6 +34,7 @@ src/compiler/CMakeFiles/compiler.dir/codegen.c.o: \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-intn.h \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-uintn.h \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdint-least.h \
+ /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/symbols.h \
  /home/mpedersen/topics/miniforth_bytecode_vm/src/compiler/../vm/miniforth.h \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/stdlib.h \
  /nix/store/lcxvgkg659vbvdq86mhxa599wn48f35c-glibc-2.40-36-dev/include/bits/stdlib-float.h \
