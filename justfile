@@ -31,7 +31,7 @@ clean:
 # Run all tests
 test: build
     @echo "Running all tests..."
-    @cd build && ctest --verbose
+    @cd build && timeout 60 ctest --verbose
 
 # Run VM-specific tests
 vm-test: build
