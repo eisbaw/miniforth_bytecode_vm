@@ -109,80 +109,76 @@ install: build-release
     @sudo cp build/miniforth-debugger /usr/local/bin/
     @echo "Installation complete!"
 
-# Measure code size (source and binary)
+# Measure bytecode VM size and performance
 code-size: build
-    @echo "Miniforth Bytecode VM Code Size Analysis"
-    @echo "========================================"
+    @echo "Miniforth Bytecode VM Size Analysis"
+    @echo "===================================="
     @echo ""
-    @echo "📊 Source Code Metrics:"
-    @echo "======================"
-    @echo "VM Source Files:"
-    @find src/vm/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
-    @find src/vm/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
-    @echo "  Files: $(find src/vm/ -name '*.c' -o -name '*.h' | wc -l)"
-    @echo ""
-    @echo "Compiler Source Files:"
-    @find src/compiler/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
-    @find src/compiler/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
-    @echo "  Files: $(find src/compiler/ -name '*.c' -o -name '*.h' | wc -l)"
-    @echo ""
-    @echo "Total Project Source:"
-    @find src/ -name "*.c" -o -name "*.h" | xargs wc -l | tail -1 | awk '{print "  Lines of code: " $$1}'
-    @find src/ -name "*.c" -o -name "*.h" | xargs wc -c | tail -1 | awk '{print "  Bytes: " $$1}'
-    @echo "  Files: $(find src/ -name '*.c' -o -name '*.h' | wc -l)"
-    @echo ""
-    @echo "💾 Binary Size Analysis:"
-    @echo "======================="
+    @echo "🎯 Target VM Binary Size:"
+    @echo "========================="
     @if [ -f build/miniforth ]; then \
-        echo "Main executable (miniforth):"; \
-        ls -lh build/miniforth | awk '{print "  Size: " $$5 " (" $$5 " bytes)"}'; \
-        echo "  Stripped size: $(strip -s build/miniforth -o /tmp/miniforth_stripped 2>/dev/null && ls -lh /tmp/miniforth_stripped | awk '{print $$5}' && rm -f /tmp/miniforth_stripped || echo 'N/A')"; \
+        echo "Main VM executable:"; \
+        ls -lh build/miniforth | awk '{print "  Size: " $$5}'; \
+        echo "  Raw bytes: $(stat -c%s build/miniforth 2>/dev/null || stat -f%z build/miniforth 2>/dev/null || echo 'N/A')"; \
+        echo "  Stripped: $(strip -s build/miniforth -o /tmp/miniforth_stripped 2>/dev/null && ls -lh /tmp/miniforth_stripped | awk '{print $$5}' && rm -f /tmp/miniforth_stripped || echo 'N/A')"; \
     else \
-        echo "Main executable: Not built"; \
+        echo "❌ Main VM executable: Not found in build/"; \
+        echo "   Try running: just build"; \
     fi
     @echo ""
-    @echo "VM Components:"
-    @if [ -f build/src/vm/libminiforth_vm.a ]; then \
-        echo "  VM Library: $(ls -lh build/src/vm/libminiforth_vm.a 2>/dev/null | awk '{print $$5}' || echo 'N/A')"; \
+    @echo "🔧 VM Core Components:"
+    @echo "====================="
+    @if [ -f build/src/vm/libvm.a ]; then \
+        echo "VM Library (libvm.a): $(ls -lh build/src/vm/libvm.a | awk '{print $$5}')"; \
+    elif [ -f build/src/vm/libminiforth_vm.a ]; then \
+        echo "VM Library: $(ls -lh build/src/vm/libminiforth_vm.a | awk '{print $$5}')"; \
+    else \
+        echo "VM Library: Not found"; \
     fi
-    @if [ -f build/src/compiler/libminiforth_compiler.a ]; then \
-        echo "  Compiler Library: $(ls -lh build/src/compiler/libminiforth_compiler.a 2>/dev/null | awk '{print $$5}' || echo 'N/A')"; \
-    fi
-    @echo ""
-    @echo "Test Executables:"
-    @if [ -f build/tests/vm_tests ]; then \
-        echo "  VM Tests: $(ls -lh build/tests/vm_tests | awk '{print $$5}')"; \
-    fi
-    @if [ -f build/tests/compiler_tests ]; then \
-        echo "  Compiler Tests: $(ls -lh build/tests/compiler_tests | awk '{print $$5}')"; \
-    fi
-    @if [ -f build/tests/integration_tests ]; then \
-        echo "  Integration Tests: $(ls -lh build/tests/integration_tests | awk '{print $$5}')"; \
+    @if [ -f build/src/compiler/libcompiler.a ]; then \
+        echo "Compiler Library (libcompiler.a): $(ls -lh build/src/compiler/libcompiler.a | awk '{print $$5}')"; \
+    elif [ -f build/src/compiler/libminiforth_compiler.a ]; then \
+        echo "Compiler Library: $(ls -lh build/src/compiler/libminiforth_compiler.a | awk '{print $$5}')"; \
+    else \
+        echo "Compiler Library: Not found"; \
     fi
     @echo ""
-    @echo "🔍 Size Breakdown by Component:"
-    @echo "=============================="
-    @echo "VM Core Instructions:"
-    @wc -l src/vm/instructions.c | awk '{print "  instructions.c: " $$1 " lines"}'
-    @echo "VM Main Engine:"
-    @wc -l src/vm/miniforth.c | awk '{print "  miniforth.c: " $$1 " lines"}'
-    @echo "Compiler Lexer:"
-    @wc -l src/compiler/lexer.c | awk '{print "  lexer.c: " $$1 " lines"}'
-    @echo "Compiler Parser:"
-    @wc -l src/compiler/parser.c | awk '{print "  parser.c: " $$1 " lines"}'
-    @echo "Code Generator:"
-    @wc -l src/compiler/codegen.c | awk '{print "  codegen.c: " $$1 " lines"}'
-    @echo "Symbol Table:"
-    @wc -l src/compiler/symbols.c | awk '{print "  symbols.c: " $$1 " lines"}'
-    @echo ""
-    @echo "📈 Build Artifacts Size:"
-    @echo "======================="
+    @echo "📊 VM Object Files:"
+    @echo "=================="
     @if [ -d build ]; then \
-        echo "Total build directory: $(du -sh build | awk '{print $$1}')"; \
-        echo "Object files: $(find build -name '*.o' | wc -l) files, $(find build -name '*.o' -exec ls -l {} + 2>/dev/null | awk '{sum+=$$5} END {print sum/1024 "KB"}' || echo '0KB')"; \
-    else \
-        echo "Build directory: Not found"; \
+        echo "VM Core Objects:"; \
+        find build -name "*miniforth*" -o -name "*instructions*" -o -name "*vm*" | grep -E "\\.o$$" | while read f; do \
+            echo "  $(basename $$f): $(ls -lh $$f | awk '{print $$5}')"; \
+        done 2>/dev/null || echo "  No VM object files found"; \
     fi
+    @echo ""
+    @echo "🏗️ Build Analysis:"
+    @echo "=================="
+    @if [ -d build ]; then \
+        echo "Build directory total: $(du -sh build 2>/dev/null | awk '{print $$1}')"; \
+        echo "All object files: $(find build -name '*.o' 2>/dev/null | wc -l) files"; \
+        echo "All libraries: $(find build -name '*.a' 2>/dev/null | wc -l) files"; \
+        echo "Executables: $(find build -type f -executable 2>/dev/null | wc -l) files"; \
+    else \
+        echo "❌ Build directory not found"; \
+    fi
+    @echo ""
+    @echo "📋 Test Executables:"
+    @echo "==================="
+    @for test in vm_tests compiler_tests integration_tests; do \
+        if [ -f build/tests/$$test ]; then \
+            echo "$$test: $(ls -lh build/tests/$$test | awk '{print $$5}')"; \
+        elif [ -f build/$$test ]; then \
+            echo "$$test: $(ls -lh build/$$test | awk '{print $$5}')"; \
+        else \
+            echo "$$test: Not found"; \
+        fi; \
+    done
+    @echo ""
+    @echo "💡 To reduce VM size:"
+    @echo "  - Use 'just build-release' for optimized build"
+    @echo "  - Strip debug symbols with 'strip build/miniforth'"
+    @echo "  - Consider compile-time optimizations (-Os, -O2)"
 
 # Show project status
 status:
