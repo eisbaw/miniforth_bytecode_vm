@@ -311,6 +311,165 @@ void test_stack_edge_cases() {
     vm_destroy(vm);
 }
 
+// Test 10: Complex arithmetic expressions
+void test_complex_arithmetic() {
+    miniforth_vm_t *vm = vm_create(64, 64, 32);
+    assert(vm != NULL);
+    
+    // Test: (10 + 5) * 2 - 3 = 27
+    uint16_t program[] = {
+        OP_LIT, 10,     // 10
+        OP_LIT, 5,      // 10 5
+        OP_ADD,         // 15
+        OP_LIT, 2,      // 15 2
+        OP_MUL,         // 30
+        OP_LIT, 3,      // 30 3
+        OP_SUB,         // 27
+        OP_EXIT
+    };
+    assert(vm_load_program(vm, program, 14) == 0);
+    assert(vm_run(vm) == VM_OK);
+    
+    uint16_t result;
+    assert(vm_pop(vm, &result) == VM_OK);
+    assert(result == 27);
+    
+    vm_destroy(vm);
+}
+
+// Test 11: Modulo operation (using division remainder)
+void test_modulo_simulation() {
+    miniforth_vm_t *vm = vm_create(64, 64, 32);
+    assert(vm != NULL);
+    
+    // Simulate 17 % 5 = 2 using: 17 - (17/5)*5
+    uint16_t program[] = {
+        OP_LIT, 17,     // dividend
+        OP_DUP,         // 17 17
+        OP_LIT, 5,      // 17 17 5
+        OP_DIV,         // 17 3 (17/5=3)
+        OP_LIT, 5,      // 17 3 5
+        OP_MUL,         // 17 15 (3*5=15)
+        OP_SUB,         // 2 (17-15=2)
+        OP_EXIT
+    };
+    assert(vm_load_program(vm, program, 16) == 0);
+    assert(vm_run(vm) == VM_OK);
+    
+    uint16_t result;
+    assert(vm_pop(vm, &result) == VM_OK);
+    assert(result == 2);  // 17 % 5 = 2
+    
+    vm_destroy(vm);
+}
+
+// Test 12: Memory operations edge cases
+void test_memory_edge_cases() {
+    miniforth_vm_t *vm = vm_create(64, 64, 32);
+    assert(vm != NULL);
+    
+    // Test memory at boundaries
+    uint16_t program[] = {
+        OP_LIT, 999,    // value
+        OP_LIT, 63,     // address (last valid address)
+        OP_STORE,       // store
+        OP_LIT, 63,     // address
+        OP_FETCH,       // fetch
+        OP_EXIT
+    };
+    assert(vm_load_program(vm, program, 12) == 0);
+    assert(vm_run(vm) == VM_OK);
+    
+    uint16_t result;
+    assert(vm_pop(vm, &result) == VM_OK);
+    assert(result == 999);
+    
+    vm_destroy(vm);
+}
+
+// Test 13: Conditional branching patterns
+void test_conditional_patterns() {
+    miniforth_vm_t *vm = vm_create(64, 64, 32);
+    assert(vm != NULL);
+    
+    // Test if-else pattern: if (5 < 10) then 42 else 99
+    uint16_t program[] = {
+        OP_LIT, 5,      // 5
+        OP_LIT, 10,     // 5 10
+        OP_LT,          // 1 (true)
+        OP_JZ, 10,      // jump to else if false (address 10)
+        OP_LIT, 42,     // then branch
+        OP_JMP, 12,     // jump to end (address 12)
+        OP_LIT, 99,     // else branch (address 10)
+        OP_EXIT         // end (address 12)
+    };
+    assert(vm_load_program(vm, program, 14) == 0);
+    assert(vm_run(vm) == VM_OK);
+    
+    uint16_t result;
+    assert(vm_pop(vm, &result) == VM_OK);
+    assert(result == 42);  // Should take then branch
+    
+    vm_destroy(vm);
+}
+
+// Test 14: Return stack operations
+void test_return_stack_edge_cases() {
+    miniforth_vm_t *vm = vm_create(64, 64, 4);  // Small return stack
+    assert(vm != NULL);
+    
+    // Fill return stack to capacity with deep recursion simulation
+    for (int i = 0; i < 4; i++) {
+        assert(vm_rpush(vm, i) == VM_OK);
+    }
+    
+    // Return stack overflow
+    assert(vm_rpush(vm, 999) == VM_ERROR_RETURN_STACK_OVERFLOW);
+    
+    // Empty return stack
+    for (int i = 0; i < 4; i++) {
+        uint16_t val;
+        assert(vm_rpop(vm, &val) == VM_OK);
+    }
+    
+    // Return stack underflow
+    uint16_t val;
+    assert(vm_rpop(vm, &val) == VM_ERROR_RETURN_STACK_UNDERFLOW);
+    
+    vm_destroy(vm);
+}
+
+// Test 15: Mixed operations stress test
+void test_mixed_operations() {
+    miniforth_vm_t *vm = vm_create(128, 128, 64);
+    assert(vm != NULL);
+    
+    // Complex program mixing all operations
+    uint16_t program[] = {
+        OP_LIT, 10,     // Initial value
+        OP_DUP,         // Duplicate it
+        OP_LIT, 5,      // Add another value
+        OP_SWAP,        // Swap order
+        OP_LIT, 1,      // Address for storage
+        OP_STORE,       // Store 10 at address 1
+        OP_ADD,         // Add remaining values (10 + 5 = 15)
+        OP_LIT, 1,      // Get stored value
+        OP_FETCH,       // Fetch 10
+        OP_MUL,         // 15 * 10 = 150
+        OP_LIT, 150,    // Expected result
+        OP_EQ,          // Compare (should be 1)
+        OP_EXIT
+    };
+    assert(vm_load_program(vm, program, 26) == 0);
+    assert(vm_run(vm) == VM_OK);
+    
+    uint16_t result;
+    assert(vm_pop(vm, &result) == VM_OK);
+    assert(result == 1);  // Comparison should be true
+    
+    vm_destroy(vm);
+}
+
 int main() {
     printf("Running Miniforth VM Tests\n");
     printf("==========================\n");
@@ -324,6 +483,10 @@ int main() {
     TEST(test_function_calls);
     TEST(test_error_handling);
     TEST(test_stack_edge_cases);
+    TEST(test_complex_arithmetic);
+    TEST(test_modulo_simulation);
+    TEST(test_memory_edge_cases);
+    TEST(test_return_stack_edge_cases);
     
     printf("\nTest Results:\n");
     printf("Tests run: %d\n", tests_run);
