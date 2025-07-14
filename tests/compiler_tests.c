@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "codegen.h"
+#include "../src/vm/miniforth.h"
 
 // Test result tracking
 static int tests_run = 0;
@@ -465,10 +466,57 @@ void test_codegen_programs() {
     lexer_destroy(lexer);
 }
 
+void test_codegen_integration() {
+    printf("  Testing end-to-end compilation and execution...\n");
+    
+    // Test a complete C program that calculates a mathematical expression
+    const char *source = "return (5 + 3) * (10 - 6) / 2;";
+    
+    // Step 1: Lex
+    lexer_t *lexer = lexer_create(source);
+    assert(lexer != NULL);
+    
+    // Step 2: Parse
+    parser_t *parser = parser_create(lexer);
+    assert(parser != NULL);
+    ast_node_t *program = parse_program(parser);
+    assert(program != NULL);
+    assert(parser->error_count == 0);
+    
+    // Step 3: Generate code
+    codegen_t *codegen = codegen_create(128);
+    assert(codegen != NULL);
+    int result = codegen_compile_ast(codegen, program);
+    assert(result == 0);
+    assert(codegen->error_count == 0);
+    
+    // Step 4: Create VM and execute
+    miniforth_vm_t *vm = vm_create(128, 64, 32);
+    assert(vm != NULL);
+    
+    result = vm_load_program(vm, codegen->code, codegen->code_size);
+    assert(result == VM_OK);
+    
+    vm_error_t exec_result = vm_run(vm);
+    assert(exec_result == VM_OK);
+    
+    // Verify the result: (5 + 3) * (10 - 6) / 2 = 8 * 4 / 2 = 32 / 2 = 16
+    assert(vm->sp > 0);
+    assert(vm->data_stack[vm->sp - 1] == 16);
+    
+    // Cleanup
+    vm_destroy(vm);
+    codegen_destroy(codegen);
+    ast_destroy(program);
+    parser_destroy(parser);
+    lexer_destroy(lexer);
+}
+
 void test_codegen_basic() {
     test_codegen_expressions();
     test_codegen_statements();
     test_codegen_programs();
+    test_codegen_integration();
 }
 
 int main() {
