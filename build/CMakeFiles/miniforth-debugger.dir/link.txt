@@ -1,1 +1,0 @@
-/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/gcc -Wall -Wextra -Wpedantic -std=c99 -g -O0 -DDEBUG "CMakeFiles/miniforth-debugger.dir/src/main.c.o" -o miniforth-debugger  src/vm/libvm.a src/tools/libtools.a src/vm/libvm.a

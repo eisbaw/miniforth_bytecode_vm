@@ -1,1 +1,0 @@
-/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/gcc -Wall -Wextra -Wpedantic -std=c99 -g -O0 -DDEBUG CMakeFiles/compiler_tests.dir/compiler_tests.c.o -o compiler_tests  ../src/vm/libvm.a ../src/compiler/libcompiler.a ../src/vm/libvm.a

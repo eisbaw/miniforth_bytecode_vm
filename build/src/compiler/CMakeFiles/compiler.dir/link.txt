@@ -1,2 +1,0 @@
-/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ar qc libcompiler.a CMakeFiles/compiler.dir/lexer.c.o CMakeFiles/compiler.dir/parser.c.o CMakeFiles/compiler.dir/codegen.c.o CMakeFiles/compiler.dir/symbols.c.o
-/nix/store/888bkaqdpfpx72dd8bdc69qsqlgbhcvf-gcc-wrapper-13.3.0/bin/ranlib libcompiler.a
