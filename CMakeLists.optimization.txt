@@ -1,0 +1,163 @@
+cmake_minimum_required(VERSION 3.16)
+project(miniforth_optimized VERSION 1.0.0 LANGUAGES C ASM)
+
+# Set C standard
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Build type options
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Size optimization option
+option(MINIFORTH_SIZE_OPTIMIZE "Size optimization level (0-2)" 1)
+option(MINIFORTH_ARM_TARGET "Build for ARM bare-metal" OFF)
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+
+# Configure optimization based on level
+if(MINIFORTH_SIZE_OPTIMIZE EQUAL 0)
+    # No size optimization - full features
+    set(SIZE_FLAGS "-O2")
+    add_definitions(-DMINIFORTH_SIZE_OPTIMIZE=0)
+elseif(MINIFORTH_SIZE_OPTIMIZE EQUAL 1)
+    # Moderate size optimization
+    set(SIZE_FLAGS "-Os -ffunction-sections -fdata-sections")
+    add_definitions(-DMINIFORTH_SIZE_OPTIMIZE=1)
+else()
+    # Aggressive size optimization
+    set(SIZE_FLAGS "-Os -flto -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector")
+    add_definitions(-DMINIFORTH_SIZE_OPTIMIZE=2 -DNDEBUG)
+endif()
+
+# ARM-specific configuration
+if(MINIFORTH_ARM_TARGET)
+    if(NOT CMAKE_TOOLCHAIN_FILE)
+        set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/arm-toolchain.cmake")
+    endif()
+    add_definitions(-DMINIFORTH_TARGET=ARM_BAREMETAL)
+    set(ARM_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/src/arm/linker_arm.ld")
+endif()
+
+# Compiler flags
+set(CMAKE_C_FLAGS "-Wall -Wextra -std=c99 ${SIZE_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG "-g -O0")
+set(CMAKE_C_FLAGS_RELEASE "${SIZE_FLAGS} -DNDEBUG")
+set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG -flto -fomit-frame-pointer")
+
+# Linker flags for size optimization
+if(MINIFORTH_SIZE_OPTIMIZE GREATER 0)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections")
+    if(NOT MINIFORTH_ARM_TARGET)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--as-needed")
+    endif()
+endif()
+
+# ARM-specific linker flags
+if(MINIFORTH_ARM_TARGET)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${ARM_LINKER_SCRIPT} -nostartfiles -nostdlib")
+endif()
+
+# Code coverage support
+if(ENABLE_COVERAGE AND NOT MINIFORTH_ARM_TARGET)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
+
+# Include directories
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vm
+)
+
+# VM library sources
+set(VM_SOURCES
+    src/vm/miniforth_small.c
+)
+
+set(VM_HEADERS
+    src/vm/miniforth_small.h
+    src/vm/miniforth_config.h
+)
+
+# Create VM library
+add_library(vm_optimized ${VM_SOURCES} ${VM_HEADERS})
+
+# Main executable targets
+if(MINIFORTH_ARM_TARGET)
+    # ARM bare-metal build
+    add_executable(miniforth_arm
+        src/arm/main_arm.c
+        src/arm/startup_arm.s
+    )
+    target_link_libraries(miniforth_arm vm_optimized)
+    
+    # Generate binary file
+    add_custom_command(TARGET miniforth_arm POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:miniforth_arm> ${CMAKE_BINARY_DIR}/miniforth_arm.bin
+        COMMENT "Generating binary file"
+    )
+    
+    # Show memory usage
+    add_custom_command(TARGET miniforth_arm POST_BUILD
+        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:miniforth_arm>
+        COMMENT "Memory usage:"
+    )
+    
+else()
+    # Hosted build
+    add_executable(miniforth_optimized src/main.c)
+    target_link_libraries(miniforth_optimized vm_optimized)
+    
+    # Strip debug symbols for size builds
+    if(MINIFORTH_SIZE_OPTIMIZE GREATER 0)
+        add_custom_command(TARGET miniforth_optimized POST_BUILD
+            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:miniforth_optimized>
+            COMMENT "Stripping debug symbols"
+        )
+    endif()
+endif()
+
+# Size analysis target
+add_custom_target(size-analysis
+    COMMAND ${CMAKE_COMMAND} -E echo "=== Size Analysis ==="
+    COMMAND ${CMAKE_COMMAND} -E echo "Build configuration:"
+    COMMAND ${CMAKE_COMMAND} -E echo "  Size optimization level: ${MINIFORTH_SIZE_OPTIMIZE}"
+    COMMAND ${CMAKE_COMMAND} -E echo "  ARM target: ${MINIFORTH_ARM_TARGET}"
+    COMMAND ${CMAKE_COMMAND} -E echo "  Build type: ${CMAKE_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E echo ""
+)
+
+if(MINIFORTH_ARM_TARGET)
+    add_dependencies(size-analysis miniforth_arm)
+    add_custom_command(TARGET size-analysis POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "ARM Binary sizes:"
+        COMMAND ls -lh ${CMAKE_BINARY_DIR}/miniforth_arm || true
+        COMMAND ls -lh ${CMAKE_BINARY_DIR}/miniforth_arm.bin || true
+        COMMAND ${CMAKE_COMMAND} -E echo ""
+        COMMAND ${CMAKE_COMMAND} -E echo "Memory usage:"
+        COMMAND ${CMAKE_SIZE} ${CMAKE_BINARY_DIR}/miniforth_arm || true
+    )
+else()
+    add_dependencies(size-analysis miniforth_optimized)
+    add_custom_command(TARGET size-analysis POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Hosted binary size:"
+        COMMAND ls -lh $<TARGET_FILE:miniforth_optimized> || true
+    )
+endif()
+
+# Print configuration summary
+message(STATUS "")
+message(STATUS "MiniForth VM Size-Optimized Build Configuration")
+message(STATUS "==============================================")
+message(STATUS "Version: ${PROJECT_VERSION}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Size optimization level: ${MINIFORTH_SIZE_OPTIMIZE}")
+message(STATUS "ARM target: ${MINIFORTH_ARM_TARGET}")
+message(STATUS "C Compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "C Flags: ${CMAKE_C_FLAGS}")
+if(MINIFORTH_ARM_TARGET)
+    message(STATUS "Linker script: ${ARM_LINKER_SCRIPT}")
+endif()
+message(STATUS "Coverage enabled: ${ENABLE_COVERAGE}")
+message(STATUS "")

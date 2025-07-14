@@ -1,0 +1,142 @@
+# MiniForth VM Size Optimization Makefile
+# Provides multiple build targets for size optimization
+
+# Compiler and tools
+CC = gcc
+ARM_CC = arm-none-eabi-gcc
+ARM_OBJCOPY = arm-none-eabi-objcopy
+ARM_SIZE = arm-none-eabi-size
+STRIP = strip
+
+# Source directories
+SRC_DIR = src
+VM_DIR = $(SRC_DIR)/vm
+ARM_DIR = $(SRC_DIR)/arm
+BUILD_DIR = build
+
+# Output directories
+HOSTED_DIR = $(BUILD_DIR)/hosted
+ARM_DIR_OUT = $(BUILD_DIR)/arm
+
+# Common source files
+VM_SOURCES = $(VM_DIR)/miniforth_small.c
+VM_HEADERS = $(VM_DIR)/miniforth_small.h $(VM_DIR)/miniforth_config.h
+
+# ARM-specific sources
+ARM_SOURCES = $(ARM_DIR)/main_arm.c $(ARM_DIR)/startup_arm.s
+ARM_LINKER = $(ARM_DIR)/linker_arm.ld
+
+# Base compiler flags
+BASE_CFLAGS = -Wall -Wextra -std=c99
+BASE_ARM_CFLAGS = -mcpu=cortex-m3 -mthumb -Wall -Wextra -std=c99
+
+# Size optimization flags (progressive levels)
+SIZE_FLAGS_1 = -Os -ffunction-sections -fdata-sections
+SIZE_FLAGS_2 = $(SIZE_FLAGS_1) -flto -fno-asynchronous-unwind-tables -fno-unwind-tables
+SIZE_FLAGS_3 = $(SIZE_FLAGS_2) -fomit-frame-pointer -fno-stack-protector -DNDEBUG
+
+# Linker flags for size optimization
+HOSTED_LDFLAGS_SIZE = -Wl,--gc-sections -Wl,--as-needed
+ARM_LDFLAGS = -T$(ARM_LINKER) -Wl,--gc-sections -nostartfiles -nostdlib -nodefaultlibs
+
+# Build targets
+.PHONY: all clean size-test hosted-normal hosted-size1 hosted-size2 hosted-size3 arm-baremetal
+
+all: hosted-normal hosted-size1 hosted-size2 hosted-size3 arm-baremetal
+
+# Create build directories
+$(HOSTED_DIR) $(ARM_DIR_OUT):
+	mkdir -p $@
+
+# Hosted builds with different optimization levels
+hosted-normal: $(HOSTED_DIR) $(HOSTED_DIR)/miniforth_normal
+hosted-size1: $(HOSTED_DIR) $(HOSTED_DIR)/miniforth_size1
+hosted-size2: $(HOSTED_DIR) $(HOSTED_DIR)/miniforth_size2  
+hosted-size3: $(HOSTED_DIR) $(HOSTED_DIR)/miniforth_size3
+
+# Normal hosted build (no size optimization)
+$(HOSTED_DIR)/miniforth_normal: $(VM_SOURCES) $(VM_HEADERS) src/main.c
+	$(CC) $(BASE_CFLAGS) -DMINIFORTH_SIZE_OPTIMIZE=0 \
+		-o $@ $(VM_SOURCES) src/main.c
+
+# Size-optimized hosted builds
+$(HOSTED_DIR)/miniforth_size1: $(VM_SOURCES) $(VM_HEADERS) src/main.c
+	$(CC) $(BASE_CFLAGS) $(SIZE_FLAGS_1) -DMINIFORTH_SIZE_OPTIMIZE=1 \
+		$(HOSTED_LDFLAGS_SIZE) -o $@ $(VM_SOURCES) src/main.c
+	$(STRIP) $@
+
+$(HOSTED_DIR)/miniforth_size2: $(VM_SOURCES) $(VM_HEADERS) src/main.c
+	$(CC) $(BASE_CFLAGS) $(SIZE_FLAGS_2) -DMINIFORTH_SIZE_OPTIMIZE=1 \
+		$(HOSTED_LDFLAGS_SIZE) -o $@ $(VM_SOURCES) src/main.c
+	$(STRIP) $@
+
+$(HOSTED_DIR)/miniforth_size3: $(VM_SOURCES) $(VM_HEADERS) src/main.c
+	$(CC) $(BASE_CFLAGS) $(SIZE_FLAGS_3) -DMINIFORTH_SIZE_OPTIMIZE=2 \
+		$(HOSTED_LDFLAGS_SIZE) -o $@ $(VM_SOURCES) src/main.c
+	$(STRIP) $@
+
+# ARM bare-metal build
+arm-baremetal: $(ARM_DIR_OUT) $(ARM_DIR_OUT)/miniforth_arm.elf $(ARM_DIR_OUT)/miniforth_arm.bin
+
+$(ARM_DIR_OUT)/miniforth_arm.elf: $(VM_SOURCES) $(VM_HEADERS) $(ARM_SOURCES) $(ARM_LINKER)
+	$(ARM_CC) $(BASE_ARM_CFLAGS) $(SIZE_FLAGS_3) \
+		-DMINIFORTH_TARGET=ARM_BAREMETAL -DMINIFORTH_SIZE_OPTIMIZE=2 \
+		$(ARM_LDFLAGS) -o $@ $(VM_SOURCES) $(ARM_DIR)/main_arm.c $(ARM_DIR)/startup_arm.s
+
+$(ARM_DIR_OUT)/miniforth_arm.bin: $(ARM_DIR_OUT)/miniforth_arm.elf
+	$(ARM_OBJCOPY) -O binary $< $@
+
+# Size comparison target
+size-test: all
+	@echo "=== MiniForth VM Size Comparison ==="
+	@echo ""
+	@echo "Hosted builds:"
+	@if [ -f $(HOSTED_DIR)/miniforth_normal ]; then \
+		echo "  Normal build:     $$(ls -lh $(HOSTED_DIR)/miniforth_normal | awk '{print $$5}') ($$(stat -c%s $(HOSTED_DIR)/miniforth_normal) bytes)"; \
+	fi
+	@if [ -f $(HOSTED_DIR)/miniforth_size1 ]; then \
+		echo "  Size level 1:     $$(ls -lh $(HOSTED_DIR)/miniforth_size1 | awk '{print $$5}') ($$(stat -c%s $(HOSTED_DIR)/miniforth_size1) bytes)"; \
+	fi
+	@if [ -f $(HOSTED_DIR)/miniforth_size2 ]; then \
+		echo "  Size level 2:     $$(ls -lh $(HOSTED_DIR)/miniforth_size2 | awk '{print $$5}') ($$(stat -c%s $(HOSTED_DIR)/miniforth_size2) bytes)"; \
+	fi
+	@if [ -f $(HOSTED_DIR)/miniforth_size3 ]; then \
+		echo "  Size level 3:     $$(ls -lh $(HOSTED_DIR)/miniforth_size3 | awk '{print $$5}') ($$(stat -c%s $(HOSTED_DIR)/miniforth_size3) bytes)"; \
+	fi
+	@echo ""
+	@echo "ARM bare-metal build:"
+	@if [ -f $(ARM_DIR_OUT)/miniforth_arm.elf ]; then \
+		echo "  ELF file:         $$(ls -lh $(ARM_DIR_OUT)/miniforth_arm.elf | awk '{print $$5}') ($$(stat -c%s $(ARM_DIR_OUT)/miniforth_arm.elf) bytes)"; \
+	fi
+	@if [ -f $(ARM_DIR_OUT)/miniforth_arm.bin ]; then \
+		echo "  Binary file:      $$(ls -lh $(ARM_DIR_OUT)/miniforth_arm.bin | awk '{print $$5}') ($$(stat -c%s $(ARM_DIR_OUT)/miniforth_arm.bin) bytes)"; \
+	fi
+	@echo ""
+	@if [ -f $(ARM_DIR_OUT)/miniforth_arm.elf ]; then \
+		echo "ARM memory usage:"; \
+		$(ARM_SIZE) $(ARM_DIR_OUT)/miniforth_arm.elf; \
+	fi
+
+# Clean build artifacts
+clean:
+	rm -rf $(BUILD_DIR)
+
+# Help target
+help:
+	@echo "MiniForth VM Size Optimization Build System"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all              - Build all variants"
+	@echo "  hosted-normal    - Standard hosted build (no optimization)"
+	@echo "  hosted-size1     - Hosted build with basic size optimization"
+	@echo "  hosted-size2     - Hosted build with advanced size optimization"
+	@echo "  hosted-size3     - Hosted build with aggressive size optimization"
+	@echo "  arm-baremetal    - ARM Cortex-M bare-metal build"
+	@echo "  size-test        - Build all variants and compare sizes"
+	@echo "  clean            - Remove all build artifacts"
+	@echo "  help             - Show this help"
+	@echo ""
+	@echo "Size optimization levels:"
+	@echo "  Level 0 (normal): All features enabled, no size optimization"
+	@echo "  Level 1 (moderate): Some features disabled, basic optimization"
+	@echo "  Level 2 (aggressive): Minimal features, maximum optimization"
