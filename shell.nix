@@ -29,20 +29,6 @@ pkgs.mkShell {
   ];
   
   shellHook = ''
-    echo "Miniforth C Compiler & VM Development Environment"
-    echo "================================================"
-    echo ""
-    echo "Available commands:"
-    echo "  just --list    - Show all available commands"
-    echo "  just build     - Build the project"
-    echo "  just test      - Run all tests"
-    echo "  just clean     - Clean build artifacts"
-    echo ""
-    echo "C Compiler: $(gcc --version | head -n1)"
-    echo "CMake: $(cmake --version | head -n1)"
-    echo "Just: $(just --version)"
-    echo ""
-    
     # Create build directory if it doesn't exist
     mkdir -p build
     
