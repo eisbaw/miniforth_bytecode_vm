@@ -47,7 +47,7 @@ u8 forth_atomic(const u8 *p, u8 n) {
     if (op == 5) {
       sp--;
       continue;
-    }              /* DROP */
+    } /* DROP */
     if (op == 6) { /* SWAP */
       t = vm[8 + sp - 1];
       vm[8 + sp - 1] = vm[8 + sp - 2];
