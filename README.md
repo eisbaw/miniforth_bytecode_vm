@@ -1,5 +1,9 @@
 # Miniforth Bytecode VM
 
+[![CI](https://github.com/YOUR_USERNAME/miniforth_bytecode_vm/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/miniforth_bytecode_vm/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Nix](https://img.shields.io/badge/built%20with-Nix-5277C3.svg)](https://nixos.org/)
+
 A complete C-to-Miniforth compilation and execution system featuring a retargeted LCC compiler backend and a custom stack-based virtual machine.
 
 ## Overview
@@ -237,12 +241,24 @@ The LCC backend is the primary compiler for this project's comprehensive stress 
 
 ### Prerequisites
 
-```bash
-# Install dependencies (NixOS example)
-nix-shell -p gcc cmake git
+The recommended way to build is using Nix for reproducible builds:
 
-# Or on Ubuntu/Debian
-sudo apt install gcc cmake git build-essential
+```bash
+# Enter development environment
+nix-shell
+
+# All dependencies are automatically available
+just --list
+```
+
+Or install dependencies manually:
+
+```bash
+# Ubuntu/Debian
+sudo apt install gcc cmake git build-essential clang-format cppcheck
+
+# NixOS
+nix-shell -p gcc cmake git clang-tools cppcheck
 ```
 
 ### Build Process
@@ -252,19 +268,32 @@ sudo apt install gcc cmake git build-essential
 git clone <repository-url>
 cd miniforth_bytecode_vm
 
-# Build LCC compiler with Miniforth backend
-cd external/lcc
-make
-cd ../..
+# Enter Nix development environment (recommended)
+nix-shell
 
-# Build VM interpreter
-mkdir build && cd build
-cmake ..
-make
-
-# Run test suite
-just test-all
+# Build everything
+just build-lcc  # Build LCC compiler with Miniforth backend
+just build      # Build VM interpreter
+just test       # Run test suite
 ```
+
+### Continuous Integration
+
+The project uses GitHub Actions for CI with comprehensive testing:
+
+- **Build**: Compiles project and LCC compiler
+- **Lint**: Static analysis with cppcheck
+- **Test**: Unit tests, integration tests, and VM tests
+- **LCC Tests**: Comprehensive testing of 31 stress test cases
+- **Coverage**: Code coverage analysis (main branch only)
+- **Security**: Security scans and credential checks
+
+All CI commands use the local-first approach:
+```bash
+nix-shell --run 'just <command>'
+```
+
+This ensures CI uses the exact same environment as local development.
 
 ## Comprehensive Test Suite
 

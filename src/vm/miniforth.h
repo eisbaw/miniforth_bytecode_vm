@@ -1,8 +1,8 @@
 #ifndef MINIFORTH_H
 #define MINIFORTH_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // Compile-time configuration
 #define MINIFORTH_WORD_SIZE 16
@@ -17,59 +17,60 @@
 
 // Instruction opcodes
 typedef enum {
-    OP_EXIT = 0x00,    // Return from word
-    OP_LIT = 0x01,     // Push literal value
-    OP_DUP = 0x02,     // Duplicate top of stack
-    OP_DROP = 0x03,    // Remove top of stack
-    OP_SWAP = 0x04,    // Exchange top two items
-    OP_ADD = 0x05,     // Addition
-    OP_SUB = 0x06,     // Subtraction
-    OP_MUL = 0x07,     // Multiplication
-    OP_DIV = 0x08,     // Division
-    OP_EQ = 0x09,      // Equality test
-    OP_LT = 0x0A,      // Less than test
-    OP_FETCH = 0x0B,   // Fetch from memory (@)
-    OP_STORE = 0x0C,   // Store to memory (!)
-    OP_JMP = 0x0D,     // Unconditional jump
-    OP_JZ = 0x0E,      // Jump if zero
-    OP_CALL = 0x0F     // Call subroutine
+  OP_EXIT = 0x00,  // Return from word
+  OP_LIT = 0x01,   // Push literal value
+  OP_DUP = 0x02,   // Duplicate top of stack
+  OP_DROP = 0x03,  // Remove top of stack
+  OP_SWAP = 0x04,  // Exchange top two items
+  OP_ADD = 0x05,   // Addition
+  OP_SUB = 0x06,   // Subtraction
+  OP_MUL = 0x07,   // Multiplication
+  OP_DIV = 0x08,   // Division
+  OP_EQ = 0x09,    // Equality test
+  OP_LT = 0x0A,    // Less than test
+  OP_FETCH = 0x0B, // Fetch from memory (@)
+  OP_STORE = 0x0C, // Store to memory (!)
+  OP_JMP = 0x0D,   // Unconditional jump
+  OP_JZ = 0x0E,    // Jump if zero
+  OP_CALL = 0x0F   // Call subroutine
 } opcode_t;
 
 // Error codes
 typedef enum {
-    VM_OK = 0,
-    VM_ERROR_STACK_OVERFLOW,
-    VM_ERROR_STACK_UNDERFLOW,
-    VM_ERROR_INVALID_OPCODE,
-    VM_ERROR_MEMORY_ACCESS,
-    VM_ERROR_DIVISION_BY_ZERO,
-    VM_ERROR_PROGRAM_COUNTER,
-    VM_ERROR_RETURN_STACK_OVERFLOW,
-    VM_ERROR_RETURN_STACK_UNDERFLOW,
-    VM_ERROR_NULL_POINTER,
-    VM_ERROR_INVALID_SIZE
+  VM_OK = 0,
+  VM_ERROR_STACK_OVERFLOW,
+  VM_ERROR_STACK_UNDERFLOW,
+  VM_ERROR_INVALID_OPCODE,
+  VM_ERROR_MEMORY_ACCESS,
+  VM_ERROR_DIVISION_BY_ZERO,
+  VM_ERROR_PROGRAM_COUNTER,
+  VM_ERROR_RETURN_STACK_OVERFLOW,
+  VM_ERROR_RETURN_STACK_UNDERFLOW,
+  VM_ERROR_NULL_POINTER,
+  VM_ERROR_INVALID_SIZE
 } vm_error_t;
 
 // VM structure
 typedef struct {
-    uint16_t *code_memory;     // Program storage
-    uint16_t *data_memory;     // Variable storage
-    uint16_t *data_stack;      // Computation stack
-    uint16_t *return_stack;    // Call stack
-    
-    uint16_t pc;               // Program counter
-    uint16_t sp;               // Stack pointer
-    uint16_t rp;               // Return stack pointer
-    
-    uint16_t code_size;        // Code memory size
-    uint16_t data_size;        // Data memory size
-    uint16_t stack_size;       // Stack size
-    
-    vm_error_t last_error;     // Last error code
+  uint16_t *code_memory;  // Program storage
+  uint16_t *data_memory;  // Variable storage
+  uint16_t *data_stack;   // Computation stack
+  uint16_t *return_stack; // Call stack
+
+  uint16_t pc; // Program counter
+  uint16_t sp; // Stack pointer
+  uint16_t rp; // Return stack pointer
+
+  uint16_t code_size;  // Code memory size
+  uint16_t data_size;  // Data memory size
+  uint16_t stack_size; // Stack size
+
+  vm_error_t last_error; // Last error code
 } miniforth_vm_t;
 
 // VM lifecycle functions
-miniforth_vm_t* vm_create(uint16_t code_size, uint16_t data_size, uint16_t stack_size);
+miniforth_vm_t *vm_create(uint16_t code_size, uint16_t data_size,
+                          uint16_t stack_size);
 void vm_destroy(miniforth_vm_t *vm);
 int vm_load_program(miniforth_vm_t *vm, const uint16_t *program, uint16_t size);
 
@@ -101,7 +102,7 @@ void vm_dump_memory(const miniforth_vm_t *vm, uint16_t start, uint16_t count);
 #endif
 
 // Error handling
-const char* vm_error_string(vm_error_t error);
+const char *vm_error_string(vm_error_t error);
 vm_error_t vm_get_last_error(miniforth_vm_t *vm);
 
 // Utility functions

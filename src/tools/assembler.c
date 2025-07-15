@@ -4,6 +4,4 @@
 // Placeholder assembler implementation
 // This will be expanded in Phase 4
 
-int placeholder_assembler_function() {
-    return 0;
-}
+int placeholder_assembler_function() { return 0; }

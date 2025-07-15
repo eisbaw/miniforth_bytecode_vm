@@ -4,6 +4,4 @@
 // Placeholder debugger implementation
 // This will be expanded in Phase 4
 
-int placeholder_debugger_function() {
-    return 0;
-}
+int placeholder_debugger_function() { return 0; }

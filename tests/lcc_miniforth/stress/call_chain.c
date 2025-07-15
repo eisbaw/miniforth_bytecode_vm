@@ -22,24 +22,24 @@ int func_02(int x) { return func_03(x + 2); }
 int func_01(int x) { return func_02(x + 1); }
 
 int complex_parameter_passing(int a, int b, int c, int d, int e) {
-    int result = 0;
-    result += a * b;
-    result += c * d;
-    result += e;
-    
-    if (result > 100) {
-        return complex_parameter_passing(a-1, b-1, c-1, d-1, e-1);
-    }
-    
-    return result;
+  int result = 0;
+  result += a * b;
+  result += c * d;
+  result += e;
+
+  if (result > 100) {
+    return complex_parameter_passing(a - 1, b - 1, c - 1, d - 1, e - 1);
+  }
+
+  return result;
 }
 
 int main() {
-    /* Test long call chain - sum should be 1+2+...+20 = 210 */
-    int chain_result = func_01(0);  // Expected: 210
-    
-    /* Test complex parameter passing */
-    int param_result = complex_parameter_passing(5, 6, 7, 8, 9);
-    
-    return chain_result;  // Expected: 210
+  /* Test long call chain - sum should be 1+2+...+20 = 210 */
+  int chain_result = func_01(0); // Expected: 210
+
+  /* Test complex parameter passing */
+  int param_result = complex_parameter_passing(5, 6, 7, 8, 9);
+
+  return chain_result; // Expected: 210
 }

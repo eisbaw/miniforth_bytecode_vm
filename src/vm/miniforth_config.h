@@ -17,7 +17,7 @@
 
 // Size optimization levels
 #ifndef MINIFORTH_SIZE_OPTIMIZE
-#define MINIFORTH_SIZE_OPTIMIZE 0  // 0=none, 1=moderate, 2=aggressive
+#define MINIFORTH_SIZE_OPTIMIZE 0 // 0=none, 1=moderate, 2=aggressive
 #endif
 
 // Core VM configuration

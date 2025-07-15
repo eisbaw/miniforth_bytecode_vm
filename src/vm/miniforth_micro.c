@@ -10,69 +10,77 @@ static u16 pc, sp;
 
 // Ultra-compact instruction encoding (4-bit opcodes)
 #define EXIT 0
-#define LIT  1  
-#define ADD  2
-#define SUB  3
-#define DUP  4
+#define LIT 1
+#define ADD 2
+#define SUB 3
+#define DUP 4
 #define DROP 5
 #define SWAP 6
 
 // Minimal API - single run function
 u8 forth_run(const u16 *prog, u8 len) {
-    // Load program
-    u8 i;
-    for (i = 0; i < len && i < 64; i++) code[i] = prog[i];
-    
-    // Reset state
-    pc = sp = 0;
-    
-    // Execution loop - minimalist dispatch
-    u16 a, b;
-    while (pc < 64) {
-        u16 op = code[pc] & 0xF;
-        
-        switch (op) {
-        case EXIT: return 0;
-        
-        case LIT:
-            if (sp >= 8) return 1;
-            stack[sp++] = code[++pc];
-            break;
-            
-        case ADD:
-            if (sp < 2) return 1;
-            b = stack[--sp];
-            stack[sp-1] += b;
-            break;
-            
-        case SUB:
-            if (sp < 2) return 1;
-            b = stack[--sp];
-            stack[sp-1] -= b;
-            break;
-            
-        case DUP:
-            if (sp == 0 || sp >= 8) return 1;
-            stack[sp] = stack[sp-1];
-            sp++;
-            break;
-            
-        case DROP:
-            if (sp == 0) return 1;
-            sp--;
-            break;
-            
-        case SWAP:
-            if (sp < 2) return 1;
-            a = stack[sp-1];
-            stack[sp-1] = stack[sp-2];
-            stack[sp-2] = a;
-            break;
-            
-        default:
-            return 1;
-        }
-        pc++;
+  // Load program
+  u8 i;
+  for (i = 0; i < len && i < 64; i++)
+    code[i] = prog[i];
+
+  // Reset state
+  pc = sp = 0;
+
+  // Execution loop - minimalist dispatch
+  u16 a, b;
+  while (pc < 64) {
+    u16 op = code[pc] & 0xF;
+
+    switch (op) {
+    case EXIT:
+      return 0;
+
+    case LIT:
+      if (sp >= 8)
+        return 1;
+      stack[sp++] = code[++pc];
+      break;
+
+    case ADD:
+      if (sp < 2)
+        return 1;
+      b = stack[--sp];
+      stack[sp - 1] += b;
+      break;
+
+    case SUB:
+      if (sp < 2)
+        return 1;
+      b = stack[--sp];
+      stack[sp - 1] -= b;
+      break;
+
+    case DUP:
+      if (sp == 0 || sp >= 8)
+        return 1;
+      stack[sp] = stack[sp - 1];
+      sp++;
+      break;
+
+    case DROP:
+      if (sp == 0)
+        return 1;
+      sp--;
+      break;
+
+    case SWAP:
+      if (sp < 2)
+        return 1;
+      a = stack[sp - 1];
+      stack[sp - 1] = stack[sp - 2];
+      stack[sp - 2] = a;
+      break;
+
+    default:
+      return 1;
     }
-    return 0;
+    pc++;
+  }
+  return 0;
 }

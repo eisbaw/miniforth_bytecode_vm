@@ -22,6 +22,13 @@ default:
     @echo "  just check-deps   - Check dependencies"
     @echo "  just help-tests   - Show test categories"
     @echo "  just dev          - Full development cycle"
+    @echo ""
+    @echo "🚀 CI/CD:"
+    @echo "  just validate-ci  - Validate CI workflow locally"
+    @echo "  just ci-build     - Run CI build job locally"
+    @echo "  just ci-lint      - Run CI lint job locally"
+    @echo "  just ci-test      - Run CI test job locally"
+    @echo "  just ci-all       - Run all CI jobs locally"
 
 # Build the project
 build:
@@ -89,6 +96,8 @@ lint:
             --suppress=syntaxError:src/vm/miniforth_ultra.c \
             --suppress=unknownEvaluationOrder:src/vm/miniforth_asm_style.c \
             --suppress=unknownEvaluationOrder:src/vm/miniforth_atomic.c \
+            --suppress=constVariablePointer:src/compiler/codegen.c \
+            --suppress=normalCheckLevelMaxBranches \
             src/; \
     else \
         echo "❌ cppcheck not found. Install with your package manager."; \
@@ -497,3 +506,47 @@ check-deps:
     @echo "  LCC compiler: $(if [ -f external/lcc/build/rcc ]; then echo '✅ built'; else echo '❌ run: just build-lcc'; fi)"
     @echo "  Main executable: $(if [ -f build/miniforth ]; then echo '✅ built'; else echo '❌ run: just build'; fi)"
     @echo "  Test files: $(find tests/lcc_miniforth -name "*.c" 2>/dev/null | wc -l) available"
+
+# Validate CI workflow locally
+validate-ci:
+    @echo "Validating CI workflow locally..."
+    @./scripts/validate-ci.sh
+
+# Run CI jobs locally for testing
+ci-build:
+    @echo "Running CI build job locally..."
+    @just check-deps
+    @just build-lcc
+    @just build
+    @just build-release
+    @just code-size
+
+ci-lint:
+    @echo "Running CI lint job locally..."
+    @just lint
+    @echo "Checking code formatting..."
+    @just format
+    @if git diff --exit-code; then \
+        echo "✅ Code formatting is correct"; \
+    else \
+        echo "⚠️  Code formatting changes needed - run 'just format' and commit"; \
+    fi
+
+ci-test:
+    @echo "Running CI test job locally..."
+    @just build
+    @just vm-test
+    @just compiler-test
+    @just integration
+
+ci-lcc:
+    @echo "Running CI LCC tests locally..."
+    @just build-lcc
+    @just quick-test
+    @just test-category arithmetic
+    @just test-category algorithms
+    @just test-category stress
+
+# Run all CI jobs sequentially
+ci-all: ci-build ci-lint ci-test ci-lcc
+    @echo "✅ All CI jobs completed successfully!"
