@@ -1,6 +1,6 @@
 # Miniforth Bytecode VM
 
-[![CI](https://github.com/YOUR_USERNAME/miniforth_bytecode_vm/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/miniforth_bytecode_vm/actions/workflows/ci.yml)
+[![CI](https://github.com/eisbaw/miniforth_bytecode_vm/actions/workflows/ci.yml/badge.svg)](https://github.com/eisbaw/miniforth_bytecode_vm/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Nix](https://img.shields.io/badge/built%20with-Nix-5277C3.svg)](https://nixos.org/)
 
