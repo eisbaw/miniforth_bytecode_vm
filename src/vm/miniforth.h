@@ -95,9 +95,9 @@ vm_error_t vm_rpop(miniforth_vm_t *vm, uint16_t *value);
 
 // Debugging support
 #if MINIFORTH_ENABLE_DEBUGGING
-void vm_dump_state(miniforth_vm_t *vm);
-void vm_dump_stack(miniforth_vm_t *vm);
-void vm_dump_memory(miniforth_vm_t *vm, uint16_t start, uint16_t count);
+void vm_dump_state(const miniforth_vm_t *vm);
+void vm_dump_stack(const miniforth_vm_t *vm);
+void vm_dump_memory(const miniforth_vm_t *vm, uint16_t start, uint16_t count);
 #endif
 
 // Error handling
@@ -106,6 +106,6 @@ vm_error_t vm_get_last_error(miniforth_vm_t *vm);
 
 // Utility functions
 void vm_reset(miniforth_vm_t *vm);
-int vm_is_running(miniforth_vm_t *vm);
+int vm_is_running(const miniforth_vm_t *vm);
 
 #endif // MINIFORTH_H

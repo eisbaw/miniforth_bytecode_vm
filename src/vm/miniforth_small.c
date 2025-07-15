@@ -545,7 +545,7 @@ void vm_reset(miniforth_vm_t *vm) {
 #endif
 }
 
-int vm_is_running(miniforth_vm_t *vm) {
+int vm_is_running(const miniforth_vm_t *vm) {
     if (!vm) return 0;
 #if MINIFORTH_USE_STATIC_ALLOCATION
     int running = vm->pc < MINIFORTH_DEFAULT_CODE_SIZE;

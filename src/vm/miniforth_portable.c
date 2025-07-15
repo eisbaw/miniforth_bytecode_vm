@@ -93,7 +93,7 @@ static u8 op_nop(void) {
 
 /* Main portable interpreter */
 u8 forth_portable(const u8 *prog, u8 len) {
-    u8 i, result;
+    u8 i;
     
     /* Initialize VM */
     for (i = 0; i < 32; i++) vm[i] = 0;
@@ -108,7 +108,7 @@ u8 forth_portable(const u8 *prog, u8 len) {
         u8 op = vm[GET_PC(state)] & 7;
         if (op >= 8) return 1; /* safety check */
         
-        result = handlers[op]();
+        u8 result = handlers[op]();
         if (result == 0) return 0; /* exit */
         if (result == 1) return 1; /* error */
         /* result == 2: continue */

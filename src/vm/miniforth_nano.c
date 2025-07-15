@@ -24,10 +24,10 @@ u8 forth_nano(const u8 *prog, u8 len) {
     for (u8 i = 0; i < len; i++) vm.code[i] = prog[i];
     
     // Ultra-compact execution using minimal branching
-    register u8 op, a, b;  // Register allocation hints
+    register u8 a;  // Register allocation hints
     
     while (vm.pc < 24) {
-        op = vm.code[vm.pc] & 7;
+        register u8 op = vm.code[vm.pc] & 7;
         
         // Branchless operation using arithmetic instead of switch/if
         if (op == 0) return 0;  // EXIT

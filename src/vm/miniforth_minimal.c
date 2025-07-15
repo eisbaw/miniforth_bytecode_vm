@@ -9,7 +9,7 @@ static u8 vm[20];  /* 12 code + 8 stack */
 
 /* Portable minimal forth interpreter */
 u8 forth_minimal(const u8 *program, u8 program_size) {
-    u8 pc, sp, opcode, temp;
+    u8 pc, sp, temp;
     u8 i;
     
     /* Initialize everything to zero */
@@ -26,7 +26,7 @@ u8 forth_minimal(const u8 *program, u8 program_size) {
     
     /* Main execution loop */
     while (pc < 12) {
-        opcode = vm[pc] & 7;  /* 3-bit opcodes for portability */
+        u8 opcode = vm[pc] & 7;  /* 3-bit opcodes for portability */
         
         /* Handle each instruction */
         if (opcode == 0) {

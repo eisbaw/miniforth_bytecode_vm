@@ -60,7 +60,7 @@ int codegen_emit_with_operand(codegen_t *codegen, uint16_t opcode, uint16_t oper
     return codegen_emit(codegen, operand);
 }
 
-size_t codegen_get_current_address(codegen_t *codegen) {
+size_t codegen_get_current_address(const codegen_t *codegen) {
     return codegen->code_size;
 }
 
@@ -84,7 +84,7 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
             strncpy(name, expr->data.identifier.name, len);
             name[len] = '\0';
             
-            symbol_t *symbol = symbol_table_lookup(codegen->symbols, name);
+            const symbol_t *symbol = symbol_table_lookup(codegen->symbols, name);
             if (!symbol) {
                 codegen_error(codegen, "Undefined variable");
                 return -1;
@@ -109,7 +109,7 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
                 // Handle assignment target (left operand)
                 ast_node_t *target = expr->data.binary.left;
                 if (target->type == AST_IDENTIFIER) {
-                    symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
+                    const symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
                     if (!symbol) {
                         codegen_error(codegen, "Undefined variable in assignment");
                         return -1;
@@ -126,13 +126,13 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
                     return 0;
                 } else if (target->type == AST_ARRAY_ACCESS) {
                     // Array assignment: arr[index] = value
-                    ast_node_t *array_node = target->data.array_access.array;
+                    const ast_node_t *array_node = target->data.array_access.array;
                     if (array_node->type != AST_IDENTIFIER) {
                         codegen_error(codegen, "Array assignment requires identifier");
                         return -1;
                     }
                     
-                    symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+                    const symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
                     if (!array_symbol) {
                         codegen_error(codegen, "Undefined array in assignment");
                         return -1;
@@ -209,13 +209,13 @@ int codegen_expression(codegen_t *codegen, ast_node_t *expr) {
         case AST_ARRAY_ACCESS: {
             // Array access: array[index]
             // First get the array base address (from the identifier)
-            ast_node_t *array_node = expr->data.array_access.array;
+            const ast_node_t *array_node = expr->data.array_access.array;
             if (array_node->type != AST_IDENTIFIER) {
                 codegen_error(codegen, "Array access requires identifier");
                 return -1;
             }
             
-            symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+            const symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
             if (!array_symbol) {
                 codegen_error(codegen, "Undefined array");
                 return -1;
@@ -315,7 +315,7 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt) {
             ast_node_t *target = stmt->data.assignment.target;
             if (target->type == AST_IDENTIFIER) {
                 // Simple variable assignment
-                symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
+                const symbol_t *symbol = symbol_table_lookup(codegen->symbols, target->data.identifier.name);
                 if (!symbol) {
                     codegen_error(codegen, "Undefined variable in assignment");
                     return -1;
@@ -342,13 +342,13 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt) {
                 // Array assignment: arr[index] = value
                 // Value is already on stack, now compute address
                 
-                ast_node_t *array_node = target->data.array_access.array;
+                const ast_node_t *array_node = target->data.array_access.array;
                 if (array_node->type != AST_IDENTIFIER) {
                     codegen_error(codegen, "Array assignment requires identifier");
                     return -1;
                 }
                 
-                symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
+                const symbol_t *array_symbol = symbol_table_lookup(codegen->symbols, array_node->data.identifier.name);
                 if (!array_symbol) {
                     codegen_error(codegen, "Undefined array in assignment");
                     return -1;

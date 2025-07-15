@@ -7,7 +7,7 @@ typedef unsigned char u8;
 u8 forth_atomic(const u8 *p, u8 n) {
     /* Local variables only - no globals to reduce overhead */
     u8 vm[16];  /* 8 code + 8 stack - minimal viable size */
-    u8 pc = 0, sp = 0, op, t;
+    u8 pc = 0, sp = 0, t;
     u8 i;
     
     /* Fast initialization */
@@ -19,7 +19,7 @@ u8 forth_atomic(const u8 *p, u8 n) {
     
     /* Minimal execution loop - no function calls */
     while (pc < 8) {
-        op = vm[pc] & 7;
+        u8 op = vm[pc] & 7;
         pc++;
         
         /* Optimized instruction handling - research shows this is smallest */

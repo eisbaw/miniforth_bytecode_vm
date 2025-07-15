@@ -31,7 +31,7 @@ int codegen_statement(codegen_t *codegen, ast_node_t *stmt);
 // Utility functions
 int codegen_emit(codegen_t *codegen, uint16_t instruction);
 int codegen_emit_with_operand(codegen_t *codegen, uint16_t opcode, uint16_t operand);
-size_t codegen_get_current_address(codegen_t *codegen);
+size_t codegen_get_current_address(const codegen_t *codegen);
 
 // Error handling
 void codegen_error(codegen_t *codegen, const char *message);

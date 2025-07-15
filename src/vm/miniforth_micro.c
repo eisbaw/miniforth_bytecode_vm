@@ -27,9 +27,9 @@ u8 forth_run(const u16 *prog, u8 len) {
     pc = sp = 0;
     
     // Execution loop - minimalist dispatch
-    u16 a, b, op;
+    u16 a, b;
     while (pc < 64) {
-        op = code[pc] & 0xF;
+        u16 op = code[pc] & 0xF;
         
         switch (op) {
         case EXIT: return 0;

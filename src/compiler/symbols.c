@@ -70,7 +70,7 @@ symbol_t* symbol_table_declare(symbol_table_t *table, const char *name, symbol_t
     if (!table || !name) return NULL;
     
     // Check if symbol already exists in current scope
-    symbol_t *existing = symbol_table_lookup_current_scope(table, name);
+    const symbol_t *existing = symbol_table_lookup_current_scope(table, name);
     if (existing) {
         // Symbol already declared in current scope
         return NULL;

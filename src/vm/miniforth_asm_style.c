@@ -25,9 +25,8 @@ u8 forth(const u16 *prog, u8 len) {
     for (i = 0; i < len && i < 64; i++) CODE[i] = prog[i];
     
     // Execute with minimal dispatch
-    u16 op;
     while (PC < 64) {
-        op = CODE[PC];
+        u16 op = CODE[PC];
         
         switch (op & 7) {  // 3-bit opcodes for density
         case 0: return 0;  // EXIT

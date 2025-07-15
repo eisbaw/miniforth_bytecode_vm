@@ -222,13 +222,13 @@ void vm_reset(miniforth_vm_t *vm) {
     memset(vm->return_stack, 0, vm->stack_size * sizeof(uint16_t));
 }
 
-int vm_is_running(miniforth_vm_t *vm) {
+int vm_is_running(const miniforth_vm_t *vm) {
     if (!vm) return 0;
     return vm->pc < vm->code_size && vm->last_error == VM_OK;
 }
 
 #if MINIFORTH_ENABLE_DEBUGGING
-void vm_dump_state(miniforth_vm_t *vm) {
+void vm_dump_state(const miniforth_vm_t *vm) {
     if (!vm) return;
     
     printf("VM State:\n");
@@ -242,7 +242,7 @@ void vm_dump_state(miniforth_vm_t *vm) {
     }
 }
 
-void vm_dump_stack(miniforth_vm_t *vm) {
+void vm_dump_stack(const miniforth_vm_t *vm) {
     if (!vm) return;
     
     printf("Data Stack (SP=%u):\n", vm->sp);
@@ -256,7 +256,7 @@ void vm_dump_stack(miniforth_vm_t *vm) {
     }
 }
 
-void vm_dump_memory(miniforth_vm_t *vm, uint16_t start, uint16_t count) {
+void vm_dump_memory(const miniforth_vm_t *vm, uint16_t start, uint16_t count) {
     if (!vm) return;
     
     printf("Memory dump from 0x%04X (%u words):\n", start, count);

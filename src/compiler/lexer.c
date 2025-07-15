@@ -87,7 +87,7 @@ static char peek(lexer_t *lexer) {
 }
 
 // Peek at next character without advancing
-static char peek_next(lexer_t *lexer) {
+static char peek_next(const lexer_t *lexer) {
     if (*lexer->current == '\0') return '\0';
     return *(lexer->current + 1);
 }

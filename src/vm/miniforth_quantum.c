@@ -15,10 +15,10 @@ u8 forth_quantum(const u8 *p, u8 n) {
     for (u8 i = 0; i < n && i < 8; i++) vm[i] = p[i];
     
     // Execute  
-    u8 pc = 0, sp = 0, op;
+    u8 pc = 0, sp = 0;
     
     while (pc < 8) {
-        op = vm[pc] & 7;
+        u8 op = vm[pc] & 7;
         
         switch (op) {
         case 0: return 0;  // EXIT
