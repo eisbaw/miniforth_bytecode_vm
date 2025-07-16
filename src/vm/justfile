@@ -1,0 +1,22 @@
+# Miniforth VM Module
+
+
+# Run static analysis on VM source code
+lint:
+	cppcheck --enable=warning,style --std=c99 --error-exitcode=1 \
+		--suppress=unusedFunction --suppress=missingIncludeSystem \
+		--suppress=syntaxError:miniforth_extreme.c \
+		--suppress=syntaxError:miniforth_ultra.c \
+		--suppress=unknownEvaluationOrder:miniforth_asm_style.c \
+		--suppress=unknownEvaluationOrder:miniforth_atomic.c \
+		--suppress=normalCheckLevelMaxBranches \
+		.
+
+# Build VM interpreter
+build:
+	mkdir -p ../../build
+	cd ../../build && cmake .. && make miniforth
+
+# Run VM unit tests
+test: build
+	cd ../../build && ./tests/vm_tests

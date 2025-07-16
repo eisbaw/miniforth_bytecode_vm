@@ -84,11 +84,13 @@ just format
 ## Specific Guidelines
 
 ### Justfile Rules
-- Commands should be quiet by default
-- Use `@` prefix to suppress command echo
-- Provide clear success/failure indicators
-- Group related commands logically
-- Avoid redundant status messages
+- **No command hiding**: Never use `@` prefix - show all commands being executed
+- **Error handling**: Use `-` prefix for commands that may fail (like `clean`)
+- **Complete documentation**: Every recipe must have a descriptive comment
+- **Modular organization**: Use `mod` for logical grouping of related recipes
+- **No default recipes**: Remove `default` recipes - users should explicitly choose what to run
+- **Consistent formatting**: Group related commands logically with section headers
+- **Avoid redundant status messages**: Let commands show their own output
 
 ### Shell.nix Rules
 - Minimal shellHook (no verbose output)
@@ -118,7 +120,10 @@ just format
 ## Anti-Patterns to Avoid
 
 ### ❌ Don't Do This
-- Verbose echo statements in justfile
+- Hide commands with `@` prefix in justfile
+- Skip error handling (`-` prefix) for fallible commands
+- Leave recipes undocumented
+- Add `default` recipes that just list other recipes
 - Chatty shell.nix configuration
 - Duplicate CI logic outside of justfile
 - Inconsistent output formatting
@@ -126,8 +131,11 @@ just format
 - Complex build scripts outside of CMake
 
 ### ✅ Do This Instead
-- Minimal, focused output
-- Use justfile for all automation
+- Show all commands being executed (no `@` prefix)
+- Use `-` prefix for commands that may fail
+- Document every recipe with clear comments
+- Use justfile modules for organization
+- Let users explicitly choose recipes to run
 - Trust the local-first approach
 - Consistent error handling
 - Address all linter warnings

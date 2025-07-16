@@ -1,32 +1,10 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? (import (builtins.fetchTarball {
+  url = "https://github.com/nixos/nixpkgs/tarball/25.05";
+  sha256 = "1915r28xc4znrh2vf4rrjnxldw2imysz819gzhk9qlrkqanmfsxd";
+}) {}) }:
 
 pkgs.mkShell {
-  buildInputs = with pkgs; [
-    # Build system
-    cmake
-    pkg-config
-    
-    # C compiler with C99 support
-    gcc
-    clang
-    
-    # Command runner
-    just
-    
-    # Development tools
-    valgrind
-    clang-tools # includes clang-format
-    cppcheck
-    lcov
-    doxygen
-    
-    # Standard development tools
-    gdb
-    gnumake
-    
-    # Git for version control
-    git
-  ];
+  buildInputs = [ pkgs.gcc pkgs.cmake pkgs.git pkgs.clang-tools pkgs.cppcheck pkgs.just pkgs.ninja ];
   
   shellHook = ''
     # Create build directory if it doesn't exist
@@ -37,5 +15,8 @@ pkgs.mkShell {
     export CXX=g++
     export CMAKE_BUILD_TYPE=Debug
     export CFLAGS="-Wall -Wextra -std=c99"
+    
+    # Just configuration
+    export JUST_LIST_SUBMODULES=true
   '';
 }

@@ -1,0 +1,18 @@
+# Miniforth Compiler Module
+
+
+# Run static analysis on compiler source code
+lint:
+	cppcheck --enable=warning,style --std=c99 --error-exitcode=1 \
+		--suppress=unusedFunction --suppress=missingIncludeSystem \
+		--suppress=constVariablePointer:codegen.c \
+		.
+
+# Build compiler component
+build:
+	mkdir -p ../../build
+	cd ../../build && cmake .. && make miniforth-compiler
+
+# Run compiler unit tests
+test: build
+	cd ../../build && ./tests/compiler_tests

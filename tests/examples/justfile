@@ -1,0 +1,48 @@
+# Miniforth Examples Module
+
+
+# Compilation recipes
+
+# Compile C source file to Miniforth bytecode
+translate FILE:
+	if [ -f "{{FILE}}.c" ]; then \
+		../../external/lcc/build/rcc -target=miniforth < "{{FILE}}.c" > "{{FILE}}.mf"; \
+		echo "Translated {{FILE}}.c to {{FILE}}.mf"; \
+	else \
+		echo "File {{FILE}}.c not found"; \
+	fi
+
+# Compile all C example files to Miniforth bytecode
+translate-all:
+	#!/usr/bin/env bash
+	for file in *.c; do
+		name=$(basename "$file" .c)
+		just translate "$name"
+	done
+
+# Execution recipes
+
+# Execute Miniforth bytecode file on VM
+run FILE:
+	if [ -f "{{FILE}}.mf" ]; then \
+		../../build/miniforth "{{FILE}}.mf"; \
+	else \
+		echo "File {{FILE}}.mf not found. Run 'just translate {{FILE}}' first"; \
+	fi
+
+# Complete workflow recipes
+
+# Compile and run fibonacci example
+fibonacci:
+	just translate fibonacci
+	just run fibonacci
+
+# Compile and run sieve example  
+sieve:
+	just translate sieve
+	just run sieve
+
+# Compile and run simple math example
+simple-math:
+	just translate simple_math
+	just run simple_math
